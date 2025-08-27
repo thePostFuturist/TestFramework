@@ -84,6 +84,10 @@ request_id = run_test_class("MyTestClass", TestPlatform.EDIT_MODE)
 - **Test Coordination > View Database Status**: Show database and system status
 - **Test Coordination > Cancel Current Test**: Cancel running test
 - **Test Coordination > Toggle Polling**: Enable/disable automatic polling
+- **Test Coordination > Debug Polling Status**: Check polling state and timing
+- **Test Coordination > Debug > Test Database Connection**: Verify database connectivity
+- **Test Coordination > Debug > Check PlayMode Completion Now**: Manually check for completed PlayMode tests
+- **Test Coordination > Debug > Manually Process Next Request**: Force process a pending request
 
 ## Database Schema
 
@@ -114,6 +118,26 @@ request_id = run_test_class("MyTestClass", TestPlatform.EDIT_MODE)
 - ✅ Python CLI interface
 - ✅ Comprehensive error handling
 - ✅ System health monitoring
+- ✅ PlayMode test completion detection
+- ✅ File monitoring fallback for reliability
+- ✅ Automatic status updates on Play mode exit
+
+## How It Works
+
+### EditMode Tests
+1. Python submits request to SQLite database
+2. Unity polls database every second
+3. TestExecutor runs tests using TestRunnerApi
+4. Callbacks fire on completion
+5. Status updated to "completed" with results
+
+### PlayMode Tests
+1. Python submits request to SQLite database
+2. Unity polls database and starts PlayMode tests
+3. EditorApplication.update callbacks pause during Play mode
+4. When Unity exits Play mode, PlayModeTestCompletionChecker activates
+5. Checks for new test result files and updates database
+6. Status updated to "completed" with results
 
 ## Troubleshooting
 
@@ -122,6 +146,12 @@ request_id = run_test_class("MyTestClass", TestPlatform.EDIT_MODE)
 2. Use menu "Test Coordination > View Database Status"
 3. Ensure polling is enabled (menu "Test Coordination > Toggle Polling")
 4. Check database exists at `Coordination/test_coordination.db`
+5. Try "Test Coordination > Debug > Test Database Connection"
+
+### PlayMode tests stuck in "running" status
+- Use menu "Test Coordination > Debug > Check PlayMode Completion Now"
+- This manually triggers the completion check
+- Should detect any test results files and update status
 
 ### Database locked errors
 - SQLite WAL mode should prevent most locking

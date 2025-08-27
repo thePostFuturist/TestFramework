@@ -379,6 +379,35 @@ namespace TestCoordination
             }
         }
         
+        public List<TestRequest> GetRunningRequests()
+        {
+            try
+            {
+                return _connection.Table<TestRequest>()
+                    .Where(r => r.Status == "running")
+                    .ToList();
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[SQLiteManager] Error getting running requests: {e.Message}");
+                return new List<TestRequest>();
+            }
+        }
+        
+        public TestRequest GetRequestById(int id)
+        {
+            try
+            {
+                return _connection.Table<TestRequest>()
+                    .FirstOrDefault(r => r.Id == id);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[SQLiteManager] Error getting request by id: {e.Message}");
+                return null;
+            }
+        }
+        
         ~SQLiteManager()
         {
             try

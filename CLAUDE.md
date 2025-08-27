@@ -340,12 +340,26 @@ public IEnumerator TestWithUniTask() => UniTask.ToCoroutine(async () => {
 - **DOTSTestBase**: ECS/DOTS testing
 
 ### Test Execution
+
+#### Command Line
 ```bash
 # EditMode tests
 Unity -runTests -projectPath . -testPlatform EditMode
 
 # PlayMode tests  
 Unity -runTests -projectPath . -testPlatform PlayMode
+```
+
+#### Via Test Coordination System
+```bash
+# Run all PlayMode tests with automatic completion detection
+python Coordination/Scripts/quick_test.py all -p play --wait
+
+# Run specific test class
+python Coordination/Scripts/quick_test.py class MyTestClass -p edit
+
+# Check test status
+python Coordination/Scripts/quick_test.py status 1
 ```
 
 ### 📚 Documentation References
@@ -358,11 +372,17 @@ Unity -runTests -projectPath . -testPlatform PlayMode
 - **refactor-agent.md**: Splits files >750 lines, enforces SOLID
 - **batch-refactor-agent.md**: Batch processes C# files, adds regions, converts async void
 - **dots-performance-profiler.md**: Analyzes DOTS/ECS performance
+- **test-coordination-agent.md**: Manages SQLite test coordination between Python and Unity
 
 ### Custom Scripts (`CustomScripts/`)
 - Automated refactoring scripts
 - Code quality tools
 - Use `CustomScripts/Output/` for generated files
+
+### Test Coordination System (`Coordination/`)
+- SQLite database coordination between Python and Unity
+- Automatic test execution with status tracking
+- PlayMode test completion detection
 
 ## 📊 Code Quality
 
