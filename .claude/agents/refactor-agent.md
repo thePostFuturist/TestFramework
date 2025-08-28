@@ -119,4 +119,20 @@ grep -r "async void" --include="*.cs" .
 grep -c "if \|else\|while\|for\|switch" *.cs
 ```
 
+**Workflow:**
+After refactoring, validate via **[4-Step Process](../../CLAUDE.md#test-development-workflow)**.
+
+**Refactor Validation:**
+- Run ALL tests after refactoring: `quick_test.py all -p both --wait`
+- Check affected classes: `quick_test.py class <RefactoredClass>Tests -p edit --wait`
+
+**Post-Refactor Checklist:**
+✅ Files <750 lines
+✅ No compilation errors (Step 3)
+✅ All tests pass (Step 4)
+✅ No async void
+✅ SOLID maintained
+
+**Common Issues:** See error table in [CLAUDE.md](../../CLAUDE.md#test-development-workflow)
+
 ---

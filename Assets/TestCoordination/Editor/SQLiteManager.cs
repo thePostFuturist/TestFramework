@@ -535,6 +535,97 @@ namespace TestCoordination
             }
         }
         
+        // Console Log Methods
+        public void SaveConsoleLog(ConsoleLogEntry logEntry)
+        {
+            try
+            {
+                _connection.Insert(logEntry);
+            }
+            catch (Exception e)
+            {
+                // Don't use Debug.LogError here to avoid recursion
+                System.Diagnostics.Debug.WriteLine($"[SQLiteManager] Error saving console log: {e.Message}");
+            }
+        }
+        
+        public void DeleteSessionLogs(string sessionId)
+        {
+            try
+            {
+                _connection.Execute("DELETE FROM console_logs WHERE session_id = ?", sessionId);
+                Debug.Log($"[SQLiteManager] Deleted logs for session: {sessionId}");
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[SQLiteManager] Error deleting session logs: {e.Message}");
+            }
+        }
+        
+        public void DeleteOldConsoleLogs(DateTime cutoffTime)
+        {
+            try
+            {
+                _connection.Execute("DELETE FROM console_logs WHERE timestamp < ?", cutoffTime);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[SQLiteManager] Error deleting old console logs: {e.Message}");
+            }
+        }
+        
+        public List<ConsoleLogEntry> GetConsoleLogs(string sessionId = null, string logLevel = null, int limit = 100)
+        {
+            try
+            {
+                var query = _connection.Table<ConsoleLogEntry>();
+                
+                if (!string.IsNullOrEmpty(sessionId))
+                {
+                    query = query.Where(l => l.SessionId == sessionId);
+                }
+                
+                if (!string.IsNullOrEmpty(logLevel))
+                {
+                    query = query.Where(l => l.LogLevel == logLevel);
+                }
+                
+                return query.OrderByDescending(l => l.Timestamp)
+                    .Take(limit)
+                    .ToList();
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[SQLiteManager] Error getting console logs: {e.Message}");
+                return new List<ConsoleLogEntry>();
+            }
+        }
+        
+        public int GetConsoleLogCount(string sessionId = null, string logLevel = null)
+        {
+            try
+            {
+                var query = _connection.Table<ConsoleLogEntry>();
+                
+                if (!string.IsNullOrEmpty(sessionId))
+                {
+                    query = query.Where(l => l.SessionId == sessionId);
+                }
+                
+                if (!string.IsNullOrEmpty(logLevel))
+                {
+                    query = query.Where(l => l.LogLevel == logLevel);
+                }
+                
+                return query.Count();
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[SQLiteManager] Error getting console log count: {e.Message}");
+                return 0;
+            }
+        }
+        
         ~SQLiteManager()
         {
             try

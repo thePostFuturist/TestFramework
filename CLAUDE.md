@@ -339,33 +339,25 @@ public IEnumerator TestWithUniTask() => UniTask.ToCoroutine(async () => {
 - **UniTaskTestBase**: Core async test support
 - **DOTSTestBase**: ECS/DOTS testing
 
-### Test Execution
+### Test Development Workflow
 
-#### Command Line
-```bash
-# EditMode tests
-Unity -runTests -projectPath . -testPlatform EditMode
+**REQUIRED 4-Step Process:**
 
-# PlayMode tests  
-Unity -runTests -projectPath . -testPlatform PlayMode
-```
+1. **Write** code/tests
+2. **Refresh**: `python Coordination/Scripts/quick_refresh.py full --wait`
+3. **Check**: `python Coordination/Scripts/quick_logs.py errors` (MUST be clean)
+4. **Test**: `python Coordination/Scripts/quick_test.py all -p edit --wait`
 
-#### Via Test Coordination System (Works When Unity Loses Focus!)
-```bash
-# Run all PlayMode tests with automatic completion detection
-python Coordination/Scripts/quick_test.py all -p play --wait
+**Error Resolution:**
+| Error | Fix |
+|-------|-----|
+| CS1626 (yield in try) | Use UniTask.ToCoroutine() |
+| UniTask not found | Add to asmdef references |
+| async void | Convert to UniTask/UniTaskVoid |
+| Thread error | UniTask.SwitchToMainThread() |
 
-# Run specific test class
-python Coordination/Scripts/quick_test.py class MyTestClass -p edit
-
-# Check test status
-python Coordination/Scripts/quick_test.py status 1
-
-# Asset refresh (NEW)
-python Coordination/Scripts/quick_refresh.py full --wait
-```
-
-**Background Processing**: System automatically processes requests even when Unity Editor is not the focused window using System.Threading.Timer and SynchronizationContext.
+**Details:** See `Coordination/README.md` for full command reference and examples.
+**Background:** Works even when Unity loses focus (System.Threading.Timer).
 
 ### 📚 Documentation References
 - `Assets/TestFramework/Unity/UNIFIED_TEST_EXECUTION_GUIDE.md`

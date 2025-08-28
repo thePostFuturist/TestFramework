@@ -89,4 +89,18 @@ Follow existing test patterns in:
 - Thread safety validated
 - Performance benchmarks where applicable
 
+**Workflow:**
+After writing tests, execute **[4-Step Process](../../CLAUDE.md#test-development-workflow)**.
+
+**Test-Specific Commands:**
+```bash
+# Run new test class
+python Coordination/Scripts/quick_test.py class <NewTestClass> -p edit --wait
+
+# Run category
+python Coordination/Scripts/quick_test.py category <Category> -p edit --wait
+```
+
+**Common Test Errors:** See error table in [CLAUDE.md](../../CLAUDE.md#test-development-workflow)
+
 ---

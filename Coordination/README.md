@@ -161,6 +161,12 @@ refresh_specific_paths(["Assets/Scripts"], ImportOptions.FORCE_UPDATE, wait=True
 - **Test Coordination > Asset Refresh > Toggle Polling**: Enable/disable refresh polling
 - **Test Coordination > Asset Refresh > Force Refresh Now**: Trigger immediate asset refresh
 
+### Console Logs
+- **Test Coordination > Console Logs > Toggle Capture**: Enable/disable log capture
+- **Test Coordination > Console Logs > Clear Current Session**: Clear logs for current Unity session
+- **Test Coordination > Console Logs > Show Session Info**: Display current session ID and capture status
+- **Test Coordination > Console Logs > Test Log Levels**: Generate test logs at all levels for verification
+
 ## Database Schema
 
 ### test_requests
@@ -186,6 +192,59 @@ refresh_specific_paths(["Assets/Scripts"], ImportOptions.FORCE_UPDATE, wait=True
 - Tracks refresh type (full/selective)
 - Import options (default/synchronous/force_update)
 - Status tracking with timing
+
+### console_logs
+- Real-time Unity console output capture
+- Intelligent stack trace truncation (removes framework calls, preserves user code)
+- Session-based tracking (current Unity session only)
+- Log levels: Info, Warning, Error, Exception, Assert
+
+## Console Log Retrieval
+
+### Quick Commands
+```bash
+# Get latest logs (all levels)
+python Coordination/Scripts/quick_logs.py latest -n 20
+
+# Get only errors/exceptions
+python Coordination/Scripts/quick_logs.py errors
+
+# Get warnings
+python Coordination/Scripts/quick_logs.py warnings
+
+# Get session summary (log counts by level)
+python Coordination/Scripts/quick_logs.py summary
+
+# Monitor logs in real-time
+python Coordination/Scripts/quick_logs.py monitor
+
+# Export logs to file
+python Coordination/Scripts/quick_logs.py export logs.json
+```
+
+### Programmatic Access
+```python
+from Coordination.Scripts.console_log_reader import ConsoleLogReader, LogLevel
+
+reader = ConsoleLogReader()
+
+# Get latest 50 error logs
+errors = reader.get_error_logs(limit=50)
+
+# Get logs from last 10 minutes
+recent = reader.get_latest_logs(minutes_ago=10)
+
+# Get session summary with counts
+summary = reader.get_session_summary()  # Returns dict with error_count, warning_count, etc.
+```
+
+### Stack Trace Truncation
+Unity stack traces are automatically truncated to minimize context usage:
+- Removes Unity framework calls (UnityEngine.*, UnityEditor.*, System.Reflection)
+- Preserves user code from Assets/ and Packages/
+- Limits to 10 relevant frames
+- Shows "[N framework calls omitted]" placeholders
+- Converts absolute paths to relative
 
 ## Features
 

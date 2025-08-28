@@ -107,6 +107,26 @@ def create_database():
             )
         """)
         
+        # Create console_logs table for Unity console output capture
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS console_logs (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                session_id TEXT NOT NULL,
+                log_level TEXT NOT NULL CHECK(log_level IN ('Info', 'Warning', 'Error', 'Exception', 'Assert')),
+                message TEXT NOT NULL,
+                stack_trace TEXT,
+                truncated_stack TEXT,
+                source_file TEXT,
+                source_line INTEGER,
+                timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                frame_count INTEGER,
+                is_truncated BOOLEAN DEFAULT 0,
+                context TEXT,
+                request_id INTEGER,
+                FOREIGN KEY (request_id) REFERENCES test_requests(id)
+            )
+        """)
+        
         # Create indexes for better query performance
         cursor.execute("CREATE INDEX IF NOT EXISTS idx_requests_status ON test_requests(status)")
         cursor.execute("CREATE INDEX IF NOT EXISTS idx_requests_created ON test_requests(created_at DESC)")
@@ -115,6 +135,11 @@ def create_database():
         cursor.execute("CREATE INDEX IF NOT EXISTS idx_status_component ON system_status(component)")
         cursor.execute("CREATE INDEX IF NOT EXISTS idx_refresh_status ON asset_refresh_requests(status)")
         cursor.execute("CREATE INDEX IF NOT EXISTS idx_refresh_created ON asset_refresh_requests(created_at DESC)")
+        
+        # Console log indexes
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_console_logs_session ON console_logs(session_id, timestamp DESC)")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_console_logs_level ON console_logs(log_level, timestamp DESC)")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_console_logs_request ON console_logs(request_id, timestamp DESC)")
         
         # Insert initial system status
         cursor.execute("""
@@ -130,6 +155,7 @@ def create_database():
         print("  - system_status")
         print("  - execution_log")
         print("  - asset_refresh_requests")
+        print("  - console_logs")
         
     except sqlite3.Error as e:
         print(f"Error creating database: {e}")
@@ -160,7 +186,7 @@ def verify_database():
         """)
         tables = cursor.fetchall()
         
-        expected_tables = {'execution_log', 'system_status', 'test_requests', 'test_results', 'asset_refresh_requests'}
+        expected_tables = {'execution_log', 'system_status', 'test_requests', 'test_results', 'asset_refresh_requests', 'console_logs'}
         actual_tables = {table[0] for table in tables}
         
         if expected_tables.issubset(actual_tables):

@@ -484,12 +484,51 @@ public IEnumerator TestParallelOperations() => RunAsyncTest(async () =>
 });
 ```
 
+## DOTS Test Development Workflow
+
+Follow the **[4-Step Process](../../CLAUDE.md#test-development-workflow)** - REQUIRED for all DOTS development.
+
+### DOTS-Specific Checks
+
+**After Step 2 (Refresh), check for DOTS errors:**
+```bash
+# Burst compilation errors
+python Coordination/Scripts/quick_logs.py errors | grep -i burst
+
+# Native collection leaks
+python Coordination/Scripts/quick_logs.py latest -n 50 | grep -i "disposed\|leak"
+
+# Job System issues
+python Coordination/Scripts/quick_logs.py latest -n 50 | grep -i "job\|scheduled"
+```
+
+**DOTS Test Commands:**
+```bash
+# Run DOTS category tests
+python Coordination/Scripts/quick_test.py category DOTS -p edit --wait
+
+# Run specific DOTS class
+python Coordination/Scripts/quick_test.py class DOTSPerformanceTests -p edit --wait
+```
+
+### Common DOTS Issues
+
+| Issue | Pattern | Fix |
+|-------|---------|-----|
+| Burst failed | "Burst compiler failed" | Check [BurstCompile] attributes |
+| Native leak | "not been disposed" | Use try-finally with .Dispose() |
+| Job safety | "previously scheduled job" | Complete handles before access |
+| Entity query | "EntityQuery is invalid" | Match archetype structure |
+
+For full command reference, see `Coordination/README.md`.
+
 ## Troubleshooting
 
 ### Tests Not Running
 1. Ensure UniTask is installed via Package Manager
 2. Check assembly references include UniTask
 3. Verify `RunAsyncTest` or `UniTask.ToCoroutine` is used
+4. Check for Burst compilation errors: `python Coordination/Scripts/quick_logs.py errors | grep -i burst`
 
 ### Memory Leaks
 1. Always dispose NativeArrays/NativeLists

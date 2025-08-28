@@ -895,13 +895,42 @@ public IEnumerator TestWithGeneratedData() => UniTask.ToCoroutine(async () =>
 });
 ```
 
+## Test Development Workflow
+
+Follow the **[4-Step Process](../../CLAUDE.md#test-development-workflow)** - REQUIRED for all Unity development.
+
+### Unity-Specific Commands
+
+**PlayMode vs EditMode:**
+```bash
+# PlayMode tests (with automatic completion detection)
+python Coordination/Scripts/quick_test.py all -p play --wait
+
+# EditMode tests (faster, no Play mode)
+python Coordination/Scripts/quick_test.py all -p edit --wait
+
+# Specific class
+python Coordination/Scripts/quick_test.py class MyTestClass -p edit --wait
+```
+
+**Monitor Execution:**
+```bash
+# Real-time monitoring
+python Coordination/Scripts/quick_logs.py monitor -l error
+
+# Check test status
+python Coordination/Scripts/quick_test.py status <request_id>
+```
+
+For full command reference and examples, see `Coordination/README.md`.
+
 ## Troubleshooting
 
 ### Tests Not Running
 1. Ensure UniTask is installed correctly
 2. Check assembly references include UniTask
 3. Verify using `UniTask.ToCoroutine()` for [UnityTest] methods
-4. Check for compilation errors in Unity Console
+4. Check for compilation errors using: `python Coordination/Scripts/quick_logs.py errors`
 
 ### Memory Leaks
 1. Always dispose CancellationTokenSource
