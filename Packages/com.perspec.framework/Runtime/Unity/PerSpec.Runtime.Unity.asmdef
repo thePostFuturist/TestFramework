@@ -1,0 +1,21 @@
+{
+    "name": "PerSpec.Runtime.Unity",
+    "rootNamespace": "PerSpec.Runtime.Unity",
+    "references": [
+        "UniTask",
+        "UniTask.Linq",
+        "UnityEngine.TestRunner",
+        "UnityEditor.TestRunner"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "nunit.framework.dll"
+    ],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

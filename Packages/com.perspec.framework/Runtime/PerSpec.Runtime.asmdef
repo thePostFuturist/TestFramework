@@ -1,0 +1,27 @@
+{
+    "name": "PerSpec.Runtime",
+    "rootNamespace": "PerSpec.Runtime",
+    "references": [
+        "PerSpec.Runtime.Debug",
+        "PerSpec.Runtime.Unity",
+        "PerSpec.Runtime.DOTS",
+        "UniTask",
+        "Unity.Entities",
+        "Unity.Entities.Hybrid",
+        "Unity.Mathematics",
+        "Unity.Transforms",
+        "Unity.Collections",
+        "Unity.Burst",
+        "UnityEngine.TestRunner",
+        "UnityEditor.TestRunner"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": true,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
