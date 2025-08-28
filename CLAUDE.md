@@ -350,7 +350,7 @@ Unity -runTests -projectPath . -testPlatform EditMode
 Unity -runTests -projectPath . -testPlatform PlayMode
 ```
 
-#### Via Test Coordination System
+#### Via Test Coordination System (Works When Unity Loses Focus!)
 ```bash
 # Run all PlayMode tests with automatic completion detection
 python Coordination/Scripts/quick_test.py all -p play --wait
@@ -360,7 +360,12 @@ python Coordination/Scripts/quick_test.py class MyTestClass -p edit
 
 # Check test status
 python Coordination/Scripts/quick_test.py status 1
+
+# Asset refresh (NEW)
+python Coordination/Scripts/quick_refresh.py full --wait
 ```
+
+**Background Processing**: System automatically processes requests even when Unity Editor is not the focused window using System.Threading.Timer and SynchronizationContext.
 
 ### 📚 Documentation References
 - `Assets/TestFramework/Unity/UNIFIED_TEST_EXECUTION_GUIDE.md`
@@ -372,7 +377,7 @@ python Coordination/Scripts/quick_test.py status 1
 - **refactor-agent.md**: Splits files >750 lines, enforces SOLID
 - **batch-refactor-agent.md**: Batch processes C# files, adds regions, converts async void
 - **dots-performance-profiler.md**: Analyzes DOTS/ECS performance
-- **test-coordination-agent.md**: Manages SQLite test coordination between Python and Unity
+- **test-coordination-agent.md**: Manages SQLite test coordination between Python and Unity (with background processing)
 
 ### Custom Scripts (`CustomScripts/`)
 - Automated refactoring scripts
@@ -383,6 +388,9 @@ python Coordination/Scripts/quick_test.py status 1
 - SQLite database coordination between Python and Unity
 - Automatic test execution with status tracking
 - PlayMode test completion detection
+- **Background processing when Unity loses focus (NEW)**
+- Asset refresh coordination
+- System.Threading.Timer for continuous polling
 
 ## 📊 Code Quality
 

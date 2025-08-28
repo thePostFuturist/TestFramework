@@ -6,7 +6,8 @@
         "UnityEditor.TestRunner",
         "UniTask",
         "TestFramework.Unity",
-        "Gilzoide.SqliteNet"
+        "Gilzoide.SqliteNet",
+        ""
     ],
     "includePlatforms": [
         "Editor"

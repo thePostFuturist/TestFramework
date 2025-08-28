@@ -7,6 +7,9 @@
       "Bash(python:*)"
     ],
     "deny": [],
-    "ask": []
+    "ask": [],
+    "additionalDirectories": [
+      "D:\\d\\Dev\\TestFramework\\Coordination"
+    ]
   }
 }

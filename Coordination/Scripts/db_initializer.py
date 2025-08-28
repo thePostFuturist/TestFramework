@@ -89,12 +89,32 @@ def create_database():
             )
         """)
         
+        # Create asset_refresh_requests table for asset refresh coordination
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS asset_refresh_requests (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                refresh_type TEXT NOT NULL DEFAULT 'full' CHECK(refresh_type IN ('full', 'selective')),
+                paths TEXT,
+                import_options TEXT DEFAULT 'default' CHECK(import_options IN ('default', 'synchronous', 'force_update')),
+                status TEXT NOT NULL DEFAULT 'pending' CHECK(status IN ('pending', 'running', 'completed', 'failed', 'cancelled')),
+                priority INTEGER DEFAULT 0,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                started_at TIMESTAMP,
+                completed_at TIMESTAMP,
+                duration_seconds REAL DEFAULT 0.0,
+                result_message TEXT,
+                error_message TEXT
+            )
+        """)
+        
         # Create indexes for better query performance
         cursor.execute("CREATE INDEX IF NOT EXISTS idx_requests_status ON test_requests(status)")
         cursor.execute("CREATE INDEX IF NOT EXISTS idx_requests_created ON test_requests(created_at DESC)")
         cursor.execute("CREATE INDEX IF NOT EXISTS idx_results_request ON test_results(request_id)")
         cursor.execute("CREATE INDEX IF NOT EXISTS idx_log_request ON execution_log(request_id)")
         cursor.execute("CREATE INDEX IF NOT EXISTS idx_status_component ON system_status(component)")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_refresh_status ON asset_refresh_requests(status)")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_refresh_created ON asset_refresh_requests(created_at DESC)")
         
         # Insert initial system status
         cursor.execute("""
@@ -109,6 +129,7 @@ def create_database():
         print("  - test_results")
         print("  - system_status")
         print("  - execution_log")
+        print("  - asset_refresh_requests")
         
     except sqlite3.Error as e:
         print(f"Error creating database: {e}")
@@ -139,7 +160,7 @@ def verify_database():
         """)
         tables = cursor.fetchall()
         
-        expected_tables = {'execution_log', 'system_status', 'test_requests', 'test_results'}
+        expected_tables = {'execution_log', 'system_status', 'test_requests', 'test_results', 'asset_refresh_requests'}
         actual_tables = {table[0] for table in tables}
         
         if expected_tables.issubset(actual_tables):

@@ -143,6 +143,46 @@ namespace TestCoordination
         public float Duration { get; set; }
     }
     
+    [Table("asset_refresh_requests")]
+    public class AssetRefreshRequest
+    {
+        [PrimaryKey, AutoIncrement, Column("id")]
+        public int Id { get; set; }
+        
+        [Column("refresh_type")]
+        public string RefreshType { get; set; }
+        
+        [Column("paths")]
+        public string Paths { get; set; }
+        
+        [Column("import_options")]
+        public string ImportOptions { get; set; }
+        
+        [Column("status")]
+        public string Status { get; set; }
+        
+        [Column("priority")]
+        public int Priority { get; set; }
+        
+        [Column("created_at")]
+        public DateTime CreatedAt { get; set; }
+        
+        [Column("started_at")]
+        public DateTime? StartedAt { get; set; }
+        
+        [Column("completed_at")]
+        public DateTime? CompletedAt { get; set; }
+        
+        [Column("duration_seconds")]
+        public float DurationSeconds { get; set; }
+        
+        [Column("result_message")]
+        public string ResultMessage { get; set; }
+        
+        [Column("error_message")]
+        public string ErrorMessage { get; set; }
+    }
+    
     public class SQLiteManager
     {
         private readonly string _dbPath;
@@ -405,6 +445,93 @@ namespace TestCoordination
             {
                 Debug.LogError($"[SQLiteManager] Error getting request by id: {e.Message}");
                 return null;
+            }
+        }
+        
+        // Asset Refresh Methods
+        public AssetRefreshRequest GetNextPendingRefreshRequest()
+        {
+            try
+            {
+                var query = _connection.Table<AssetRefreshRequest>()
+                    .Where(r => r.Status == "pending")
+                    .OrderByDescending(r => r.Priority)
+                    .ThenBy(r => r.CreatedAt)
+                    .FirstOrDefault();
+                
+                return query;
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[SQLiteManager] Error getting pending refresh request: {e.Message}");
+                return null;
+            }
+        }
+        
+        public void UpdateRefreshRequestStatus(int requestId, string status, string resultMessage = null, string errorMessage = null)
+        {
+            try
+            {
+                var request = _connection.Table<AssetRefreshRequest>().FirstOrDefault(r => r.Id == requestId);
+                
+                if (request != null)
+                {
+                    request.Status = status;
+                    
+                    if (status == "running")
+                    {
+                        request.StartedAt = DateTime.Now;
+                    }
+                    else if (status == "completed" || status == "failed" || status == "cancelled")
+                    {
+                        request.CompletedAt = DateTime.Now;
+                        if (request.StartedAt.HasValue)
+                        {
+                            request.DurationSeconds = (float)(DateTime.Now - request.StartedAt.Value).TotalSeconds;
+                        }
+                        request.ResultMessage = resultMessage;
+                        request.ErrorMessage = errorMessage;
+                    }
+                    
+                    _connection.Update(request);
+                    Debug.Log($"[SQLiteManager] Updated refresh request {requestId} status to {status}");
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[SQLiteManager] Error updating refresh request status: {e.Message}");
+            }
+        }
+        
+        public List<AssetRefreshRequest> GetPendingRefreshRequests()
+        {
+            try
+            {
+                return _connection.Table<AssetRefreshRequest>()
+                    .Where(r => r.Status == "pending")
+                    .OrderByDescending(r => r.Priority)
+                    .ThenBy(r => r.CreatedAt)
+                    .ToList();
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[SQLiteManager] Error getting pending refresh requests: {e.Message}");
+                return new List<AssetRefreshRequest>();
+            }
+        }
+        
+        public List<AssetRefreshRequest> GetRunningRefreshRequests()
+        {
+            try
+            {
+                return _connection.Table<AssetRefreshRequest>()
+                    .Where(r => r.Status == "running")
+                    .ToList();
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[SQLiteManager] Error getting running refresh requests: {e.Message}");
+                return new List<AssetRefreshRequest>();
             }
         }
         

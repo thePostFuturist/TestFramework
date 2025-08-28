@@ -2,8 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
+using System.Threading;
 using UnityEngine;
 using UnityEditor;
+using UnityEditor.Compilation;
 using UnityEngine.TestTools;
 using UnityEditor.TestTools.TestRunner.Api;
 using System.Collections;
@@ -20,9 +22,18 @@ namespace TestCoordination
         private static TestExecutor _testExecutor;
         private static int _currentRequestId = -1;
         
+        // Background processing support
+        private static SynchronizationContext _unitySyncContext;
+        private static System.Threading.Timer _backgroundTimer;
+        private static bool _useBackgroundPolling = true;
+        private static DateTime _lastBackgroundPoll;
+        
         static TestCoordinatorEditor()
         {
             Debug.Log("[TestCoordinator] Initializing test coordination system");
+            
+            // Capture Unity's sync context for thread marshalling
+            _unitySyncContext = SynchronizationContext.Current;
             
             _dbManager = new SQLiteManager();
             _testExecutor = new TestExecutor(_dbManager);
@@ -32,10 +43,66 @@ namespace TestCoordination
             // Initialize last check time
             _lastCheckTime = EditorApplication.timeSinceStartup;
             
+            // Set up background polling if enabled
+            if (_useBackgroundPolling)
+            {
+                SetupBackgroundPolling();
+            }
+            
+            // Force Unity to run in background
+            Application.runInBackground = true;
+            
             // Update system heartbeat
             _dbManager.UpdateSystemHeartbeat("Unity");
             
             Debug.Log("[TestCoordinator] Test coordination system initialized");
+        }
+        
+        private static void SetupBackgroundPolling()
+        {
+            _backgroundTimer = new System.Threading.Timer(
+                BackgroundPollCallback,
+                null,
+                TimeSpan.FromSeconds(2), // Initial delay
+                TimeSpan.FromSeconds(1)  // Repeat every second
+            );
+            
+            Debug.Log("[TestCoordinator] Background polling enabled");
+        }
+        
+        private static void BackgroundPollCallback(object state)
+        {
+            // Skip if already running tests
+            if (_isRunningTests)
+                return;
+            
+            try
+            {
+                // Check database from background thread (thread-safe)
+                var request = _dbManager.GetNextPendingRequest();
+                
+                if (request != null)
+                {
+                    _lastBackgroundPoll = DateTime.Now;
+                    Debug.Log($"[TestCoordinator-BG] Found pending test request #{request.Id}");
+                    
+                    // Marshal back to Unity main thread
+                    _unitySyncContext?.Post(_ =>
+                    {
+                        if (!_isRunningTests && request != null)
+                        {
+                            CheckForPendingRequests();
+                            // Force compilation to ensure Unity processes
+                            CompilationPipeline.RequestScriptCompilation();
+                        }
+                    }, null);
+                }
+            }
+            catch (Exception e)
+            {
+                // Log but don't crash the background thread
+                UnityEngine.Debug.LogError($"[TestCoordinator-BG] Error: {e.Message}");
+            }
         }
         
         private static void OnEditorUpdate()

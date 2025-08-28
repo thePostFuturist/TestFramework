@@ -10,6 +10,8 @@ This agent specializes in:
 - Monitoring test execution and results
 - Troubleshooting PlayMode test completion issues
 - Handling database synchronization between Python and Unity
+- Background processing when Unity loses focus
+- Asset refresh coordination
 
 ## Key Features
 
@@ -18,6 +20,7 @@ This agent specializes in:
 - WAL mode for concurrent access
 - Automatic polling every second in Unity
 - Status tracking: pending → running → completed/failed
+- **Background polling with System.Threading.Timer** (works when Unity loses focus)
 
 ### Test Execution
 - **EditMode Tests**: Direct execution with callback-based completion
@@ -56,6 +59,13 @@ python Coordination/Scripts/quick_test.py class MyTestClass -p edit
 - Polls database every second
 - Processes pending requests
 - Manages test execution flow
+- **Background timer for unfocused processing**
+
+### BackgroundPoller (NEW)
+- System.Threading.Timer for true background operation
+- SynchronizationContext for thread marshalling
+- Forces script compilation with CompilationPipeline
+- Works when Unity loses focus
 
 ### TestExecutor
 - Dual-detection system (callbacks + file monitoring)
@@ -67,7 +77,22 @@ python Coordination/Scripts/quick_test.py class MyTestClass -p edit
 - Detects test completion after exiting Play mode
 - Updates database with results
 
+### AssetRefreshCoordinator (NEW)
+- Processes asset refresh requests
+- Uses AssetDatabase.Refresh with options
+- Background timer support
+- Completion detection via AssetPostprocessor
+
 ## Common Issues & Solutions
+
+### Unity Not Processing When Unfocused
+**Issue**: EditorApplication.update stops when Unity loses focus
+
+**Solution**:
+1. BackgroundPoller.cs automatically handles this
+2. System.Threading.Timer runs on background thread
+3. Menu: "Test Coordination > Background Polling > Enable"
+4. Forces compilation with CompilationPipeline.RequestScriptCompilation()
 
 ### PlayMode Tests Not Completing
 **Issue**: Tests stuck in "running" status after PlayMode execution
@@ -132,6 +157,9 @@ stack_trace TEXT
 - **Test Coordination > Debug Polling Status**: Check polling state
 - **Test Coordination > Debug > Check PlayMode Completion Now**: Manual completion check
 - **Test Coordination > Debug > Test Database Connection**: Verify connectivity
+- **Test Coordination > Background Polling > Enable/Disable**: Control background processing
+- **Test Coordination > Background Polling > Status**: Check background timer status
+- **Test Coordination > Background Polling > Force Script Compilation**: Trigger compilation
 
 ## Implementation Notes
 
@@ -139,6 +167,9 @@ stack_trace TEXT
 - Unity API calls must stay on main thread
 - SQLite operations are thread-safe with WAL mode
 - File monitoring uses EditorApplication.update
+- **Background polling uses System.Threading.Timer**
+- **SynchronizationContext marshals to main thread**
+- **CompilationPipeline forces Unity updates**
 
 ### Performance
 - 1-second polling interval (adjustable)
@@ -183,3 +214,6 @@ python Coordination/Scripts/quick_test.py status 1
 - `Assets/TestCoordination/Editor/TestExecutor.cs` - Test execution
 - `Assets/TestCoordination/Editor/PlayModeTestCompletionChecker.cs` - PlayMode detection
 - `Assets/TestCoordination/Editor/SQLiteManager.cs` - Database operations
+- `Assets/TestCoordination/Editor/BackgroundPoller.cs` - **Background processing (NEW)**
+- `Assets/TestCoordination/Editor/AssetRefreshCoordinator.cs` - Asset refresh handling
+- `Coordination/Scripts/asset_refresh_coordinator.py` - Python refresh interface
