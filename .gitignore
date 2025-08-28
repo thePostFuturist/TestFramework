@@ -21,7 +21,7 @@
 *.dll
 *.dylib
 *.so
-**/*.framework/*
-!**/*.framework/*.meta
+# Exception for PerSpec package - don't ignore these
+!Packages/com.perspec.framework/
 /.idea/
 /TestResults*
