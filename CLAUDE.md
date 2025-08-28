@@ -1,31 +1,184 @@
 # CLAUDE.md
 
-> **Purpose**: Comprehensive guidance for Claude Code (claude.ai/code) for Test-Driven Development in Unity projects.
+> **Purpose**: Comprehensive guidance for Claude Code (claude.ai/code) for Test-Driven Development in Unity projects using the PerSpec framework.
 
 ## 📋 Table of Contents
+- [TDD Development Workflow](#tdd-development-workflow) ⭐ **START HERE**
 - [Project Overview](#project-overview)
 - [Critical Unity Patterns](#critical-unity-patterns)
 - [SOLID Principles](#solid-principles)
 - [Component References](#component-references)
-- [Test Framework](#test-framework)
+- [Test Framework Details](#test-framework-details)
 - [Agents & Tools](#agents--tools)
 - [Important Rules](#important-rules)
 
+## 🚀 TDD Development Workflow
+
+> **THIS IS THE CORE OF DEVELOPMENT** - All features must follow this workflow!
+
+### 📌 The 4-Step Process (REQUIRED)
+
+```bash
+# Step 1: Write code and tests with TDD
+# Step 2: Refresh Unity
+python ScriptingTools/Coordination/Scripts/quick_refresh.py full --wait
+
+# Step 3: Check for compilation errors (MUST be clean)
+python ScriptingTools/Coordination/Scripts/quick_logs.py errors
+
+# Step 4: Run tests
+python ScriptingTools/Coordination/Scripts/quick_test.py all -p edit --wait
+```
+
+### 🔄 TDD Development Cycle
+
+**A. Feature Implementation (TDD)**
+1. User requests a feature
+2. **Create prefab factory FIRST** (unless testing pure utilities)
+3. Write tests using the prefab pattern
+4. Write production code to make tests pass
+5. Include debug logs with proper prefixes
+
+> **DEFAULT APPROACH**: Use the Prefab Pattern for ALL Unity tests except pure utility functions. See [Unity Test Guide](Packages/com.perspec.framework/Documentation~/unity-test-guide.md#testing-approach-prefab-pattern-default) for details.
+
+```csharp
+// STEP 1: Create Prefab Factory (Editor/PrefabFactories/DataProcessorFactory.cs)
+[MenuItem("Tests/Prefabs/Create DataProcessor")]
+public static void CreateDataProcessorPrefab() {
+    var go = new GameObject("DataProcessor");
+    go.AddComponent<DataProcessor>().FindVars();
+    PrefabUtility.SaveAsPrefabAsset(go, "Assets/Resources/TestPrefabs/DataProcessor.prefab");
+    Object.DestroyImmediate(go);
+}
+
+// STEP 2: Test Using Prefab (Tests/PlayMode/DataProcessorTests.cs)
+[UnityTest]
+public IEnumerator Should_ProcessDataCorrectly() => UniTask.ToCoroutine(async () => {
+    // Arrange - Load prefab (not create GameObject)
+    Debug.Log("[TEST-SETUP] Loading test prefab");
+    var prefab = Resources.Load<GameObject>("TestPrefabs/DataProcessor");
+    var instance = Object.Instantiate(prefab);
+    var component = instance.GetComponent<DataProcessor>();
+    
+    // Act
+    Debug.Log("[TEST] Processing data");
+    var result = await component.ProcessAsync(testData);
+    
+    // Assert
+    Assert.IsTrue(result.Success, "[TEST-ASSERT] Processing should succeed");
+    Debug.Log($"[TEST-COMPLETE] Test passed with result: {result}");
+});
+
+// Production Code
+public class DataProcessor : MonoBehaviour {
+    [SerializeField] private bool debugLogs = true;
+    
+    public async UniTask<ProcessResult> ProcessAsync(byte[] data) {
+        if (debugLogs) Debug.Log($"[PROCESS] Starting with {data.Length} bytes");
+        
+        try {
+            // Implementation
+            await UniTask.Delay(100);
+            
+            if (debugLogs) Debug.Log("[PROCESS] Completed successfully");
+            return new ProcessResult { Success = true };
+        } catch (Exception ex) {
+            Debug.LogError($"[PROCESS-ERROR] Failed: {ex.Message}");
+            throw;
+        }
+    }
+}
+```
+
+**B. Refresh Unity**
+```bash
+python ScriptingTools/Coordination/Scripts/quick_refresh.py full --wait
+# Wait for "Refresh completed" confirmation
+```
+
+**C. Check Compilation**
+```bash
+python ScriptingTools/Coordination/Scripts/quick_logs.py errors
+# Must show "No errors found" before proceeding
+```
+
+**D. Run Tests**
+```bash
+python ScriptingTools/Coordination/Scripts/quick_test.py all -p edit --wait
+# If tests fail, return to step A
+# Repeat cycle until all tests pass
+```
+
+### ⚠️ CRITICAL: Never Skip Steps!
+- **NEVER** write code without tests
+- **NEVER** proceed with compilation errors
+- **ALWAYS** wait for refresh completion
+- **ALWAYS** check logs before running tests
+
+### 📝 Logging Standards for TDD
+
+```csharp
+// Test Logs
+Debug.Log("[TEST] Test execution message");
+Debug.Log("[TEST-SETUP] Test setup/arrange phase");
+Debug.Log("[TEST-ACT] Test action phase");
+Debug.Log("[TEST-ASSERT] Test assertion phase");
+Debug.Log("[TEST-COMPLETE] Test completed");
+Debug.LogError("[TEST-ERROR] Test failed: reason");
+
+// Production Logs (with serialized bool)
+[SerializeField] private bool debugLogs = true;
+if (debugLogs) Debug.Log("[FEATURE] Operation message");
+if (debugLogs) Debug.Log("[FEATURE-START] Starting operation");
+if (debugLogs) Debug.Log("[FEATURE-PROGRESS] Progress update");
+if (debugLogs) Debug.Log("[FEATURE-COMPLETE] Operation complete");
+Debug.LogError("[FEATURE-ERROR] Critical error (always log)");
+```
+
+### 🛠️ Error Resolution Quick Reference
+
+| Error | Fix | Command to Verify |
+|-------|-----|-------------------|
+| CS1626 (yield in try) | Use `UniTask.ToCoroutine()` | `quick_logs.py errors` |
+| UniTask not found | Add to asmdef references | `quick_refresh.py full --wait` |
+| async void | Convert to `UniTask`/`UniTaskVoid` | `quick_logs.py errors` |
+| Thread error | `UniTask.SwitchToMainThread()` | `quick_test.py` |
+| Test timeout | Add timeout attribute or check async | `quick_test.py -v` |
+
 ## 🎯 Project Overview
 
-Unity Test Framework with **UniTask** for zero-allocation async/await patterns and TDD.
+**PerSpec** - Unity Test Framework with **UniTask** for zero-allocation async/await patterns and TDD.
 
 ### Key Features
+- ✅ **4-Step TDD Workflow** with automated testing
 - ✅ Zero-allocation async testing with UniTask
 - ✅ TDD patterns for Unity prefabs/components
+- ✅ Background test coordination (works when Unity loses focus)
 - ✅ Automated refactoring agents
 - ✅ SOLID principles enforcement
 
-### 📁 Output Directory Convention
-**IMPORTANT**: Generated files in subdirectories only:
-- Use `CustomScripts/Output/` for script-generated files
-- Create descriptive subdirectories: `Output/Reports/`, `Output/Refactored/`, `Output/Tests/`
-- Example: `CustomScripts/Output/Reports/large-files.txt`
+### 📁 Directory Structure
+```
+TestFramework/
+├── Packages/
+│   └── com.perspec.framework/     # PerSpec Unity Package
+│       ├── Runtime/                # Runtime components
+│       ├── Editor/                 # Editor tools & coordination
+│       └── Tests/                  # Framework tests
+├── Assets/
+│   └── Tests/                      # Your project tests
+│       └── PerSpec/               # PerSpec test directories (with asmdef)
+├── PerSpec/                        # Working directory (writable)
+│   ├── test_coordination.db       # SQLite database
+│   └── Scripts/                   # Convenience wrappers
+├── ScriptingTools/
+│   └── Coordination/
+│       └── Scripts/               # Python coordination tools
+└── CustomScripts/
+    └── Output/                    # Generated files go here
+        ├── Reports/
+        ├── Refactored/
+        └── Tests/
 
 ## ⚠️ Critical Unity Patterns
 
@@ -311,7 +464,21 @@ public async Task<ProcessResult> ProcessBatchAsync(byte[] data, int retryCount =
 }
 ```
 
-## 🧪 Test Framework
+## 🧪 Test Framework Details
+
+### Prefab Pattern (Default for 99% of Tests)
+
+Always use prefab pattern for:
+- MonoBehaviours
+- Component interactions  
+- Systems with dependencies
+- UI elements
+- Gameplay mechanics
+
+Only skip prefab pattern for:
+- Pure math utilities
+- String helpers
+- Static methods without Unity APIs
 
 ### UniTask Test Pattern
 ```csharp
@@ -336,32 +503,39 @@ public IEnumerator TestWithUniTask() => UniTask.ToCoroutine(async () => {
 ```
 
 ### Test Base Classes
-- **UniTaskTestBase**: Core async test support
-- **DOTSTestBase**: ECS/DOTS testing
+- **UniTaskTestBase**: Core async test support (`Packages/com.perspec.framework/Runtime/Unity/Helpers/`)
+- **DOTSTestBase**: ECS/DOTS testing (`Packages/com.perspec.framework/Runtime/DOTS/Core/`)
 
-### Test Development Workflow
+### Assembly Definition Requirements
+> **CRITICAL**: Each new directory requires an asmdef!
 
-**REQUIRED 4-Step Process:**
-
-1. **Write** code/tests
-2. **Refresh**: `python Coordination/Scripts/quick_refresh.py full --wait`
-3. **Check**: `python Coordination/Scripts/quick_logs.py errors` (MUST be clean)
-4. **Test**: `python Coordination/Scripts/quick_test.py all -p edit --wait`
-
-**Error Resolution:**
-| Error | Fix |
-|-------|-----|
-| CS1626 (yield in try) | Use UniTask.ToCoroutine() |
-| UniTask not found | Add to asmdef references |
-| async void | Convert to UniTask/UniTaskVoid |
-| Thread error | UniTask.SwitchToMainThread() |
-
-**Details:** See `Coordination/README.md` for full command reference and examples.
-**Background:** Works even when Unity loses focus (System.Threading.Timer).
+```json
+// Example: Assets/Tests/PerSpec/PerSpec.Tests.asmdef
+{
+    "name": "PerSpec.Tests",
+    "rootNamespace": "PerSpec.Tests",
+    "references": [
+        "PerSpec.Runtime",
+        "UniTask",
+        "UnityEngine.TestRunner",
+        "UnityEditor.TestRunner"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": ["nunit.framework.dll"],
+    "autoReferenced": false,
+    "defineConstraints": ["UNITY_INCLUDE_TESTS"],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
+```
 
 ### 📚 Documentation References
-- `Assets/TestFramework/Unity/UNIFIED_TEST_EXECUTION_GUIDE.md`
-- `Assets/TestFramework/DOTS/DOTS_TEST_EXECUTION_GUIDE.md`
+- Test execution guides in `Packages/com.perspec.framework/Documentation~/`
+- Coordination tools in `ScriptingTools/Coordination/Scripts/`
+- PerSpec working directory: `PerSpec/` (project root)
 
 ## 🤖 Agents & Tools
 
@@ -376,13 +550,27 @@ public IEnumerator TestWithUniTask() => UniTask.ToCoroutine(async () => {
 - Code quality tools
 - Use `CustomScripts/Output/` for generated files
 
-### Test Coordination System (`Coordination/`)
-- SQLite database coordination between Python and Unity
-- Automatic test execution with status tracking
-- PlayMode test completion detection
-- **Background processing when Unity loses focus (NEW)**
-- Asset refresh coordination
-- System.Threading.Timer for continuous polling
+### Test Coordination System
+
+**PerSpec Coordination** (`ScriptingTools/Coordination/Scripts/`)
+- SQLite database in `PerSpec/test_coordination.db`
+- Python tools for Unity control:
+  - `quick_refresh.py` - Refresh Unity assets
+  - `quick_test.py` - Execute tests
+  - `quick_logs.py` - View Unity console logs
+  - `console_log_reader.py` - Read captured logs
+
+**Background Processing** (`Packages/com.perspec.framework/Editor/Coordination/`)
+- `BackgroundPoller.cs` - System.Threading.Timer for continuous polling
+- `TestCoordinatorEditor.cs` - Main coordination system
+- `SQLiteManager.cs` - Database operations
+- Works even when Unity loses focus!
+
+**Menu Items** (Tools > PerSpec)
+- Initialize PerSpec - Set up working directories
+- Test Coordinator - View status
+- Console Logs - View/export logs
+- Commands - Execute operations
 
 ## 📊 Code Quality
 
