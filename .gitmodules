@@ -1,0 +1,4 @@
+[submodule "Packages/com.perspec.framework"]
+	path = Packages/com.perspec.framework
+	url = https://github.com/yourusername/perspec-framework.git
+	branch = main
