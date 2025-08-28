@@ -7,7 +7,7 @@ namespace PerSpec.Editor.Coordination
 {
     public static class TestCoordinationDebug
     {
-        [MenuItem("Tools/PerSpec/Debug/Force Reinitialize", priority = 502)]
+        // Method now accessed via Control Center
         public static void ForceReinitialize()
         {
             Debug.Log("[TestCoordinationDebug] Forcing reinitialization...");
@@ -16,7 +16,7 @@ namespace PerSpec.Editor.Coordination
             EditorUtility.RequestScriptReload();
         }
         
-        [MenuItem("Tools/PerSpec/Debug/Test Connection", priority = 503)]
+        // Method now accessed via Control Center
         public static void TestDatabaseConnection()
         {
             try
@@ -42,7 +42,7 @@ namespace PerSpec.Editor.Coordination
             }
         }
         
-        [MenuItem("Tools/PerSpec/Debug/Process Next Request", priority = 504)]
+        // Method now accessed via Control Center
         public static void ManuallyProcessNextRequest()
         {
             try
@@ -98,7 +98,7 @@ namespace PerSpec.Editor.Coordination
             }
         }
         
-        [MenuItem("Tools/PerSpec/Debug/Clear Pending Requests", priority = 505)]
+        // Method now accessed via Control Center
         public static void ClearAllPendingRequests()
         {
             try

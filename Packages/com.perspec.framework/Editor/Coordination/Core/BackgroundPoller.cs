@@ -305,22 +305,19 @@ namespace PerSpec.Editor.Coordination
         }
         
         // Menu items for manual control
-        // Background polling controls are now integrated into the main coordinator
-        // These items are kept for backward compatibility but hidden from menu
-        [MenuItem("Tools/PerSpec/Internal/Enable Polling", false, 999)]
+        // Methods now accessed via Control Center
         public static void MenuEnablePolling()
         {
             EnableBackgroundPolling();
         }
         
-        [MenuItem("Tools/PerSpec/Internal/Disable Polling", false, 999)]
+        // Method now accessed via Control Center
         public static void MenuDisablePolling()
         {
             DisableBackgroundPolling();
         }
         
-        // Status is now shown in Debug/Polling Status
-        [MenuItem("Tools/PerSpec/Internal/Polling Status Info", false, 999)]
+        // Method now accessed via Control Center
         public static void ShowPollingStatus()
         {
             Debug.Log($"[BackgroundPoller] Status: {(_isEnabled ? "ENABLED" : "DISABLED")}");
@@ -332,7 +329,7 @@ namespace PerSpec.Editor.Coordination
             }
         }
         
-        [MenuItem("Tools/PerSpec/Commands/Force Script Compilation", priority = 103)]
+        // Method now accessed via Control Center
         public static void ForceScriptCompilation()
         {
             Debug.Log("[BackgroundPoller] Forcing script compilation");

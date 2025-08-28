@@ -255,14 +255,13 @@ namespace PerSpec.Editor.Coordination
             }
         }
         
-        // Menu items for manual control
-        [MenuItem("Tools/PerSpec/Asset Refresh/Check Pending", priority = 300)]
+        // Methods now accessed via Control Center
         public static void ManualCheckPendingRequests()
         {
             CheckForPendingRefreshRequests();
         }
         
-        [MenuItem("Tools/PerSpec/Asset Refresh/View Pending", priority = 301)]
+        // Method now accessed via Control Center
         public static void ViewPendingRequests()
         {
             var requests = _dbManager.GetPendingRefreshRequests();
@@ -281,14 +280,14 @@ namespace PerSpec.Editor.Coordination
             }
         }
         
-        [MenuItem("Tools/PerSpec/Asset Refresh/Toggle Polling", priority = 302)]
+        // Method now accessed via Control Center
         public static void TogglePolling()
         {
             _pollingEnabled = !_pollingEnabled;
             Debug.Log($"[AssetRefreshCoordinator] Polling {(_pollingEnabled ? "enabled" : "disabled")}");
         }
         
-        [MenuItem("Tools/PerSpec/Asset Refresh/Force Refresh Now", priority = 303)]
+        // Method now accessed via Control Center
         public static void ForceRefreshNow()
         {
             Debug.Log("[AssetRefreshCoordinator] Forcing asset refresh");

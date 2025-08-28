@@ -307,15 +307,14 @@ namespace PerSpec.Editor.Coordination
             }
         }
         
-        // Menu items
-        [MenuItem("Tools/PerSpec/Console Logs/Toggle Capture", priority = 200)]
+        // Methods now accessed via Control Center
         public static void ToggleCapture()
         {
             _isCapturing = !_isCapturing;
             Debug.Log($"[ConsoleLogCapture] Capture {(_isCapturing ? "ENABLED" : "DISABLED")}");
         }
         
-        [MenuItem("Tools/PerSpec/Console Logs/Clear Session", priority = 201)]
+        // Method now accessed via Control Center
         public static void ClearCurrentSession()
         {
             try
@@ -329,7 +328,7 @@ namespace PerSpec.Editor.Coordination
             }
         }
         
-        [MenuItem("Tools/PerSpec/Console Logs/Show Session Info", priority = 202)]
+        // Method now accessed via Control Center
         public static void ShowSessionInfo()
         {
             Debug.Log($"[ConsoleLogCapture] Session ID: {SessionId}");
@@ -339,7 +338,7 @@ namespace PerSpec.Editor.Coordination
             Debug.Log($"  Max Line Length: {_maxLineLength}");
         }
         
-        [MenuItem("Tools/PerSpec/Debug/Test Log Levels", priority = 510)]
+        // Method now accessed via Control Center
         public static void TestLogLevels()
         {
             Debug.Log("[TEST] This is an info message");

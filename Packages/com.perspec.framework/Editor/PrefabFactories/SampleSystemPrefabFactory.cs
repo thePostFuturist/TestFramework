@@ -19,7 +19,7 @@ namespace PerSpec.Editor.PrefabFactories
         
         #region Menu Items
         
-        [MenuItem("Tools/PerSpec/Prefabs/Create Sample Prefab", priority = 400)]
+        // Method now accessed via Control Center
         public static void CreateSampleSystemPrefab()
         {
             // Ensure directory exists
@@ -56,7 +56,7 @@ namespace PerSpec.Editor.PrefabFactories
             }
         }
         
-        [MenuItem("Tools/PerSpec/Prefabs/Recreate Sample Prefab", priority = 401)]
+        // Method now accessed via Control Center
         public static void RecreateSampleSystemPrefab()
         {
             // Delete existing prefab if it exists
@@ -160,7 +160,7 @@ namespace PerSpec.Editor.PrefabFactories
         
         #region Validation
         
-        [MenuItem("Tools/PerSpec/Prefabs/Validate Prefabs", priority = 402)]
+        // Method now accessed via Control Center
         public static void ValidatePrefab()
         {
             var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(PREFAB_PATH);
@@ -250,7 +250,7 @@ namespace PerSpec.Editor.PrefabFactories
         
         #region Batch Operations
         
-        [MenuItem("Tools/PerSpec/Prefabs/Create All Prefabs", priority = 403)]
+        // Method now accessed via Control Center
         public static void CreateAllTestPrefabs()
         {
             Debug.Log("[TestFramework] Creating all test prefabs...");
@@ -262,7 +262,7 @@ namespace PerSpec.Editor.PrefabFactories
             AssetDatabase.Refresh();
         }
         
-        [MenuItem("Tools/PerSpec/Prefabs/Validate All Prefabs", priority = 404)]
+        // Method now accessed via Control Center
         public static void ValidateAllTestPrefabs()
         {
             Debug.Log("[TestFramework] Validating all test prefabs...");

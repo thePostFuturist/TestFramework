@@ -269,7 +269,7 @@ namespace PerSpec.Editor.Coordination
             }
         }
         
-        [MenuItem("Tools/PerSpec/Test Coordinator", priority = -90)]
+        // Window functionality now accessed via Control Center - Tools > PerSpec > Control Center
         public static void ShowTestCoordinatorWindow()
         {
             Debug.Log("[PerSpec] Test Coordinator is running in background mode.");
@@ -283,7 +283,7 @@ namespace PerSpec.Editor.Coordination
             }
         }
         
-        [MenuItem("Tools/PerSpec/Commands/Check Pending Tests", priority = 100)]
+        // Method now accessed via Control Center
         public static void ManualCheckPendingRequests()
         {
             if (!_isRunningTests)
@@ -296,7 +296,7 @@ namespace PerSpec.Editor.Coordination
             }
         }
         
-        [MenuItem("Tools/PerSpec/Debug/Database Status", priority = 500)]
+        // Method now accessed via Control Center
         public static void ViewDatabaseStatus()
         {
             if (_dbManager != null)
@@ -306,7 +306,7 @@ namespace PerSpec.Editor.Coordination
             }
         }
         
-        [MenuItem("Tools/PerSpec/Commands/Cancel Current Test", priority = 101)]
+        // Method now accessed via Control Center
         public static void CancelCurrentTest()
         {
             if (_isRunningTests && _currentRequestId > 0)
@@ -322,7 +322,7 @@ namespace PerSpec.Editor.Coordination
             }
         }
         
-        [MenuItem("Tools/PerSpec/Commands/Toggle Auto-Polling", priority = 102)]
+        // Method now accessed via Control Center
         public static void TogglePolling()
         {
             if (_checkInterval > 0)
@@ -337,7 +337,7 @@ namespace PerSpec.Editor.Coordination
             }
         }
         
-        [MenuItem("Tools/PerSpec/Debug/Polling Status", priority = 501)]
+        // Method now accessed via Control Center
         public static void DebugPollingStatus()
         {
             double currentTime = EditorApplication.timeSinceStartup;

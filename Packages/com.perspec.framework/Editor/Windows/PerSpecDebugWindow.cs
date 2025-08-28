@@ -31,7 +31,7 @@ namespace PerSpec.Editor.Windows
         
         #region Unity Menu
         
-        [MenuItem("Tools/PerSpec/Debug Settings", priority = 200)]
+        // Window now accessed via Control Center - Tools > PerSpec > Control Center
         public static void ShowWindow()
         {
             var window = GetWindow<PerSpecDebugWindow>(false, WINDOW_TITLE);
@@ -306,27 +306,24 @@ PerSpecDebug.LogTestSetup(""Creating prefab"");";
         
         #endregion
         
-        #region Quick Toggle Menu Items
+        #region Quick Toggle Methods (accessed via Control Center)
         
-        [MenuItem("Tools/PerSpec/Debug/Enable Debug Logging", priority = 201)]
+        // These methods are now called from PerSpecControlCenter
         private static void EnableDebugLogging()
         {
             SetDebugEnabled(true);
         }
         
-        [MenuItem("Tools/PerSpec/Debug/Enable Debug Logging", true)]
         private static bool ValidateEnableDebugLogging()
         {
             return !IsDebugEnabled();
         }
         
-        [MenuItem("Tools/PerSpec/Debug/Disable Debug Logging", priority = 202)]
         private static void DisableDebugLogging()
         {
             SetDebugEnabled(false);
         }
         
-        [MenuItem("Tools/PerSpec/Debug/Disable Debug Logging", true)]
         private static bool ValidateDisableDebugLogging()
         {
             return IsDebugEnabled();
