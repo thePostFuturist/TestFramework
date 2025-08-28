@@ -5,7 +5,12 @@
       "WebFetch(domain:github.com)",
       "Bash(bash:*)",
       "Bash(python:*)",
-      "Bash(git log:*)"
+      "Bash(git log:*)",
+      "Bash(for file in Unity/Helpers/UniTaskRunner.cs Unity/Helpers/UniTaskTestHelpers.cs DOTS/Core/DOTSTestBase.cs DOTS/Helpers/DOTSTestFactory.cs DOTS/Helpers/DOTSTestConfiguration.cs)",
+      "Bash(do sed -i \"s/namespace TestFramework\\.Unity\\.Helpers/namespace PerSpec.Runtime.Unity/\" \"$file\")",
+      "Bash(sed:*)",
+      "Bash(done)",
+      "Bash(find:*)"
     ],
     "deny": [],
     "ask": [],
