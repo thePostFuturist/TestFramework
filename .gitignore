@@ -22,7 +22,7 @@
 *.dylib
 *.so
 # Exception for PerSpec package - don't ignore these
-!Packages/com.perspec.framework/
+!Packages/com.digitraver.perspec/
 /.idea/
 /TestResults*
 /PerSpec*

@@ -1,4 +1,4 @@
-[submodule "Packages/com.perspec.framework"]
-	path = Packages/com.perspec.framework
-	url = https://github.com/yourusername/perspec-framework.git
+[submodule "Packages/com.digitraver.perspec"]
+	path = Packages/com.digitraver.perspec
+	url = https://github.com/thePostFuturist/PerSpec.git
 	branch = main
