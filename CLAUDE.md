@@ -52,38 +52,42 @@ public static void CreateDataProcessorPrefab() {
 }
 
 // STEP 2: Test Using Prefab (Tests/PlayMode/DataProcessorTests.cs)
+using PerSpec;
+
 [UnityTest]
 public IEnumerator Should_ProcessDataCorrectly() => UniTask.ToCoroutine(async () => {
     // Arrange - Load prefab (not create GameObject)
-    Debug.Log("[TEST-SETUP] Loading test prefab");
+    PerSpecDebug.LogTestSetup("Loading test prefab");
     var prefab = Resources.Load<GameObject>("TestPrefabs/DataProcessor");
     var instance = Object.Instantiate(prefab);
     var component = instance.GetComponent<DataProcessor>();
     
     // Act
-    Debug.Log("[TEST] Processing data");
+    PerSpecDebug.LogTest("Processing data");
     var result = await component.ProcessAsync(testData);
     
     // Assert
-    Assert.IsTrue(result.Success, "[TEST-ASSERT] Processing should succeed");
-    Debug.Log($"[TEST-COMPLETE] Test passed with result: {result}");
+    Assert.IsTrue(result.Success, "Processing should succeed");
+    PerSpecDebug.LogTestComplete($"Test passed with result: {result}");
 });
 
 // Production Code
+using PerSpec;
+
 public class DataProcessor : MonoBehaviour {
     [SerializeField] private bool debugLogs = true;
     
     public async UniTask<ProcessResult> ProcessAsync(byte[] data) {
-        if (debugLogs) Debug.Log($"[PROCESS] Starting with {data.Length} bytes");
+        if (debugLogs) PerSpecDebug.LogFeatureStart("PROCESS", $"Starting with {data.Length} bytes");
         
         try {
             // Implementation
             await UniTask.Delay(100);
             
-            if (debugLogs) Debug.Log("[PROCESS] Completed successfully");
+            if (debugLogs) PerSpecDebug.LogFeatureComplete("PROCESS", "Completed successfully");
             return new ProcessResult { Success = true };
         } catch (Exception ex) {
-            Debug.LogError($"[PROCESS-ERROR] Failed: {ex.Message}");
+            PerSpecDebug.LogFeatureError("PROCESS", $"Failed: {ex.Message}");
             throw;
         }
     }
@@ -117,22 +121,26 @@ python ScriptingTools/Coordination/Scripts/quick_test.py all -p edit --wait
 
 ### 📝 Logging Standards for TDD
 
-```csharp
-// Test Logs
-Debug.Log("[TEST] Test execution message");
-Debug.Log("[TEST-SETUP] Test setup/arrange phase");
-Debug.Log("[TEST-ACT] Test action phase");
-Debug.Log("[TEST-ASSERT] Test assertion phase");
-Debug.Log("[TEST-COMPLETE] Test completed");
-Debug.LogError("[TEST-ERROR] Test failed: reason");
+> **IMPORTANT**: Use PerSpecDebug instead of Debug.Log. These calls are conditionally compiled and stripped in production builds!
 
-// Production Logs (with serialized bool)
+```csharp
+using PerSpec;
+
+// Test Logs (automatically stripped in production)
+PerSpecDebug.LogTest("Test execution message");
+PerSpecDebug.LogTestSetup("Test setup/arrange phase");
+PerSpecDebug.LogTestAct("Test action phase");
+PerSpecDebug.LogTestAssert("Test assertion phase");
+PerSpecDebug.LogTestComplete("Test completed");
+PerSpecDebug.LogTestError("Test failed: reason");
+
+// Feature/Production Logs (with serialized bool for runtime control)
 [SerializeField] private bool debugLogs = true;
-if (debugLogs) Debug.Log("[FEATURE] Operation message");
-if (debugLogs) Debug.Log("[FEATURE-START] Starting operation");
-if (debugLogs) Debug.Log("[FEATURE-PROGRESS] Progress update");
-if (debugLogs) Debug.Log("[FEATURE-COMPLETE] Operation complete");
-Debug.LogError("[FEATURE-ERROR] Critical error (always log)");
+if (debugLogs) PerSpecDebug.LogFeature("FEATURE", "Operation message");
+if (debugLogs) PerSpecDebug.LogFeatureStart("FEATURE", "Starting operation");
+if (debugLogs) PerSpecDebug.LogFeatureProgress("FEATURE", "Progress update");
+if (debugLogs) PerSpecDebug.LogFeatureComplete("FEATURE", "Operation complete");
+PerSpecDebug.LogFeatureError("FEATURE", "Critical error (always log)");
 ```
 
 ### 🛠️ Error Resolution Quick Reference
@@ -201,7 +209,7 @@ public IEnumerator GoodTest() => UniTask.ToCoroutine(async () => {
         await UniTask.Delay(1000); // Full try-catch support!
         await ProcessDataAsync();
     } catch (Exception ex) {
-        Debug.LogError($"[ERROR] {ex.Message}");
+        PerSpecDebug.LogError($"Error: {ex.Message}");
         throw;
     }
 });
@@ -226,7 +234,7 @@ public async UniTaskVoid FireAndForget() {
     try {
         await UniTask.Delay(100);
     } catch (Exception ex) {
-        Debug.LogError($"[ERROR] {ex.Message}");
+        PerSpecDebug.LogError($"Error: {ex.Message}");
     }
 }
 ```
@@ -303,7 +311,7 @@ public class Sword : Weapon {
 ```csharp
 // ❌ BAD: Breaking base contract
 public class Bird {
-    public virtual void Fly() => Debug.Log("Flying");
+    public virtual void Fly() => PerSpecDebug.Log("Flying");
 }
 public class Penguin : Bird {
     public override void Fly() {
@@ -597,9 +605,9 @@ public IEnumerator TestWithUniTask() => UniTask.ToCoroutine(async () => {
 
 ### Logging Standards
 ```csharp
-Debug.Log($"[TEST] Message");
-Debug.Log($"[TEST-SETUP] Setup message");
-Debug.LogError($"[TEST-ERROR] Error: {message}");
+PerSpecDebug.LogTest("Message");
+PerSpecDebug.LogTestSetup("Setup message");
+PerSpecDebug.LogTestError($"Error: {message}");
 ```
 
 ### Common Issues & Solutions
