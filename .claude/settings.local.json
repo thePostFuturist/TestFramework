@@ -10,7 +10,8 @@
       "Bash(do sed -i \"s/namespace TestFramework\\.Unity\\.Helpers/namespace PerSpec.Runtime.Unity/\" \"$file\")",
       "Bash(sed:*)",
       "Bash(done)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "WebFetch(domain:docs.unity3d.com)"
     ],
     "deny": [],
     "ask": [],
