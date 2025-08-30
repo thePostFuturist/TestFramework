@@ -4,14 +4,67 @@
 > **Purpose**: Comprehensive guidance for Claude Code (claude.ai/code) for Test-Driven Development in Unity projects using the PerSpec framework.
 
 ## 📋 Table of Contents
+- [Quick Start - Finding PerSpec](#quick-start---finding-perspec) 🔍 **READ FIRST**
 - [TDD Development Workflow](#tdd-development-workflow) ⭐ **START HERE**
+- [Natural Language Commands](#natural-language-commands) 🗣️ **MCP-LIKE BEHAVIOR**
 - [Project Overview](#project-overview)
 - [Critical Unity Patterns](#critical-unity-patterns)
 - [SOLID Principles](#solid-principles)
 - [Component References](#component-references)
 - [Test Framework Details](#test-framework-details)
+- [Documentation & Guides](#documentation--guides) 📚
 - [Agents & Tools](#agents--tools)
 - [Important Rules](#important-rules)
+
+## 🔍 Quick Start - Finding PerSpec
+
+> **IMPORTANT**: Always dynamically locate the PerSpec package to handle PackageCache hash changes!
+
+### Finding the Package Location
+```bash
+# Find PerSpec package location (use this FIRST when working with PerSpec)
+find Packages Library/PackageCache -name "com.digitraver.perspec*" -type d 2>/dev/null | head -1
+
+# Alternative: Using ls
+ls -d Packages/com.digitraver.perspec 2>/dev/null || ls -d Library/PackageCache/com.digitraver.perspec@* 2>/dev/null | head -1
+```
+
+### Working with PerSpec Scripts
+```bash
+# The wrapper scripts are in the project root PerSpec directory
+# They automatically find the correct package location
+python PerSpec/scripts/refresh.py full --wait
+python PerSpec/scripts/test.py all -p edit --wait
+python PerSpec/scripts/logs.py errors
+```
+
+> **Note**: The PerSpec/scripts directory contains wrapper scripts that dynamically locate the actual Python scripts in the package. These wrappers are self-healing and will find the package even after Unity reinstalls with new cache hashes.
+
+## 🗣️ Natural Language Commands
+
+> **MCP-LIKE BEHAVIOR**: When users ask for logs or tests in natural language, translate to these commands:
+
+| User Says | Execute |
+|-----------|----------|
+| "get warning logs" | `python PerSpec/scripts/logs.py warnings` |
+| "show me the errors" | `python PerSpec/scripts/logs.py errors` |
+| "check for compilation errors" | `python PerSpec/scripts/logs.py errors` |
+| "run the tests" | `python PerSpec/scripts/test.py all -p edit --wait` |
+| "refresh Unity" | `python PerSpec/scripts/refresh.py full --wait` |
+| "show test results" | `python PerSpec/scripts/logs.py latest -n 50` |
+| "monitor the logs" | `python PerSpec/scripts/logs.py monitor` |
+| "export the logs" | `python PerSpec/scripts/logs.py export logs.txt` |
+| "check Unity status" | `python PerSpec/scripts/logs.py summary` |
+| "list recent sessions" | `python PerSpec/scripts/logs.py sessions` |
+
+### Understanding User Intent
+- **"Something is wrong"** → Check errors first: `python PerSpec/scripts/logs.py errors`
+- **"Tests failing"** → Run tests with verbose: `python PerSpec/scripts/test.py all -v --wait`
+- **"Unity not responding"** → Check logs and refresh: 
+  ```bash
+  python PerSpec/scripts/logs.py latest -n 20
+  python PerSpec/scripts/refresh.py full --wait
+  ```
 
 ## 🚀 TDD Development Workflow
 
@@ -545,6 +598,23 @@ public IEnumerator TestWithUniTask() => UniTask.ToCoroutine(async () => {
 - Test execution guides in `Packages/com.digitraver.perspec/Documentation/`
 - Coordination tools in `PerSpec/scripts/` (wrapper scripts)
 - PerSpec working directory: `PerSpec/` (project root)
+
+## 📚 Documentation & Guides
+
+### Core Documentation
+- **[quick-start.md](Packages/com.digitraver.perspec/Documentation/quick-start.md)** - Getting started with PerSpec, installation, and first test
+- **[workflow.md](Packages/com.digitraver.perspec/Documentation/workflow.md)** - Complete TDD workflow, best practices, and development cycle
+- **[unity-test-guide.md](Packages/com.digitraver.perspec/Documentation/unity-test-guide.md)** - Unity testing patterns, prefab approach, UniTask integration
+- **[dots-test-guide.md](Packages/com.digitraver.perspec/Documentation/dots-test-guide.md)** - DOTS/ECS testing, systems testing, job testing
+- **[coordination-guide.md](Packages/com.digitraver.perspec/Documentation/coordination-guide.md)** - Python-Unity coordination, SQLite database, background processing
+- **[claude-integration.md](Packages/com.digitraver.perspec/Documentation/claude-integration.md)** - Claude Code integration, agent usage, automation
+
+### Agent Documentation
+- **[agents/test-writer-agent.md](Packages/com.digitraver.perspec/Documentation/agents/test-writer-agent.md)** - Writes comprehensive Unity tests with TDD approach
+- **[agents/refactor-agent.md](Packages/com.digitraver.perspec/Documentation/agents/refactor-agent.md)** - Splits large files, enforces SOLID principles
+- **[agents/batch-refactor-agent.md](Packages/com.digitraver.perspec/Documentation/agents/batch-refactor-agent.md)** - Batch processes C# files, adds regions, converts async
+- **[agents/dots-performance-profiler.md](Packages/com.digitraver.perspec/Documentation/agents/dots-performance-profiler.md)** - Analyzes DOTS/ECS performance, Burst compilation
+- **[agents/test-coordination-agent.md](Packages/com.digitraver.perspec/Documentation/agents/test-coordination-agent.md)** - Manages test execution through SQLite coordination
 
 ## 🤖 Agents & Tools
 
