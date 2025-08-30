@@ -16,52 +16,33 @@
 - [Agents & Tools](#agents--tools)
 - [Important Rules](#important-rules)
 
-## 🔍 Quick Start - Finding PerSpec
+## 🔍 Quick Start - PerSpec Scripts
 
-> **IMPORTANT**: Always read the package location from the tracking file FIRST!
+> **IMPORTANT**: All scripts are in fixed locations for easy access!
 
-### Finding the Package Location
-```bash
-# STEP 1: Read the package location from the tracking file (ALWAYS DO THIS FIRST)
-if [ -f "PerSpec/package_location.txt" ]; then
-    PACKAGE_PATH=$(head -n 1 PerSpec/package_location.txt)
-    echo "Package found at: $PACKAGE_PATH"
-else
-    echo "Location file not found, searching..."
-    # STEP 2: Fallback - Find PerSpec package location dynamically
-    PACKAGE_PATH=$(find Packages Library/PackageCache -name "com.digitraver.perspec*" -type d 2>/dev/null | head -1)
-    echo "Package found at: $PACKAGE_PATH"
-fi
-
-# For one-liner usage:
-PACKAGE_PATH=$(head -n 1 PerSpec/package_location.txt 2>/dev/null || find Packages Library/PackageCache -name "com.digitraver.perspec*" -type d 2>/dev/null | head -1)
-```
+### Script Location
+- **Coordination Scripts**: `PerSpec/Coordination/Scripts/` - All Python tools
 
 ### Package Info Files
-- **`PerSpec/package_location.txt`** - Contains the current package path (first line)
-- **`PerSpec/package_info.json`** - JSON format with full package information
+- **`PerSpec/package_location.txt`** - Contains the package path reference
+- **`PerSpec/package_info.json`** - JSON format with package information
 
 ### Working with PerSpec Scripts
 ```bash
-# The wrapper scripts are in the project root PerSpec directory
-# They automatically find the correct package location
-python PerSpec/scripts/refresh.py full --wait
-python PerSpec/scripts/test.py all -p edit --wait
-python PerSpec/scripts/logs.py errors
+# Use the coordination scripts directly
+python PerSpec/Coordination/Scripts/quick_refresh.py full --wait
+python PerSpec/Coordination/Scripts/quick_test.py all -p edit --wait
+python PerSpec/Coordination/Scripts/quick_logs.py errors
 ```
 
-### Accessing Package Files Directly
+### Accessing Package Files
 ```bash
-# When you need to read or edit package files, ALWAYS get the path first:
-PACKAGE_PATH=$(head -n 1 PerSpec/package_location.txt 2>/dev/null)
-
-# Then use it to access files:
-cat "$PACKAGE_PATH/Documentation/unity-test-guide.md"
-ls "$PACKAGE_PATH/ScriptingTools/Coordination/Scripts/"
-python "$PACKAGE_PATH/ScriptingTools/Coordination/Scripts/quick_logs.py" errors
+# Package is always at a known location
+cat "Packages/com.digitraver.perspec/Documentation/unity-test-guide.md"
+ls "Packages/com.digitraver.perspec/Editor/"
 ```
 
-> **Note**: The PerSpec/scripts directory contains wrapper scripts that dynamically locate the actual Python scripts in the package. These wrappers are self-healing and will find the package even after Unity reinstalls with new cache hashes.
+> **Note**: The coordination scripts are hardcoded to fixed paths for reliability and simplicity.
 
 ## 🗣️ Natural Language Commands
 
@@ -69,24 +50,24 @@ python "$PACKAGE_PATH/ScriptingTools/Coordination/Scripts/quick_logs.py" errors
 
 | User Says | Execute |
 |-----------|----------|
-| "get warning logs" | `python PerSpec/scripts/logs.py warnings` |
-| "show me the errors" | `python PerSpec/scripts/logs.py errors` |
-| "check for compilation errors" | `python PerSpec/scripts/logs.py errors` |
-| "run the tests" | `python PerSpec/scripts/test.py all -p edit --wait` |
-| "refresh Unity" | `python PerSpec/scripts/refresh.py full --wait` |
-| "show test results" | `python PerSpec/scripts/logs.py latest -n 50` |
-| "monitor the logs" | `python PerSpec/scripts/logs.py monitor` |
-| "export the logs" | `python PerSpec/scripts/logs.py export logs.txt` |
-| "check Unity status" | `python PerSpec/scripts/logs.py summary` |
-| "list recent sessions" | `python PerSpec/scripts/logs.py sessions` |
+| "get warning logs" | `python PerSpec/Coordination/Scripts/quick_logs.py warnings` |
+| "show me the errors" | `python PerSpec/Coordination/Scripts/quick_logs.py errors` |
+| "check for compilation errors" | `python PerSpec/Coordination/Scripts/quick_logs.py errors` |
+| "run the tests" | `python PerSpec/Coordination/Scripts/quick_test.py all -p edit --wait` |
+| "refresh Unity" | `python PerSpec/Coordination/Scripts/quick_refresh.py full --wait` |
+| "show test results" | `python PerSpec/Coordination/Scripts/quick_logs.py latest -n 50` |
+| "monitor the logs" | `python PerSpec/Coordination/Scripts/quick_logs.py monitor` |
+| "export the logs" | `python PerSpec/Coordination/Scripts/quick_logs.py export` |
+| "check Unity status" | `python PerSpec/Coordination/Scripts/quick_logs.py summary` |
+| "list recent sessions" | `python PerSpec/Coordination/Scripts/quick_logs.py sessions` |
 
 ### Understanding User Intent
-- **"Something is wrong"** → Check errors first: `python PerSpec/scripts/logs.py errors`
-- **"Tests failing"** → Run tests with verbose: `python PerSpec/scripts/test.py all -v --wait`
+- **"Something is wrong"** → Check errors first: `python PerSpec/Coordination/Scripts/quick_logs.py errors`
+- **"Tests failing"** → Run tests with verbose: `python PerSpec/Coordination/Scripts/quick_test.py all -v --wait`
 - **"Unity not responding"** → Check logs and refresh: 
   ```bash
-  python PerSpec/scripts/logs.py latest -n 20
-  python PerSpec/scripts/refresh.py full --wait
+  python PerSpec/Coordination/Scripts/quick_logs.py latest -n 20
+  python PerSpec/Coordination/Scripts/quick_refresh.py full --wait
   ```
 
 ## 📊 Test Results Location
@@ -122,6 +103,28 @@ grep -E "passed|failed|errors" PerSpec/TestResults/*.xml
 | "check test output" | `ls PerSpec/TestResults/` |
 | "find failed tests" | `grep -l "failed" PerSpec/TestResults/*.xml` |
 
+## 📝 Console Log Exports
+
+> **IMPORTANT**: Console logs are automatically saved to `PerSpec/Logs/` with auto-cleanup
+
+### Export Behavior
+- **Default Export**: `python PerSpec/Coordination/Scripts/quick_logs.py export`
+  - Automatically saves to `PerSpec/Logs/ConsoleLogs_YYYYMMDD_HHMMSS.txt`
+  - Clears all existing files in `PerSpec/Logs/` before exporting (like TestResults)
+  - No need to specify output path
+- **JSON Export**: `python PerSpec/Coordination/Scripts/quick_logs.py export --json`
+- **Custom Path**: `python PerSpec/Coordination/Scripts/quick_logs.py export custom.txt`
+- **Filter by Level**: `python PerSpec/Coordination/Scripts/quick_logs.py export -l error`
+
+### Natural Language for Log Exports
+| User Says | Execute |
+|-----------|----------|
+| "export the logs" | `python PerSpec/Coordination/Scripts/quick_logs.py export` |
+| "export error logs" | `python PerSpec/Coordination/Scripts/quick_logs.py export -l error` |
+| "export logs as json" | `python PerSpec/Coordination/Scripts/quick_logs.py export --json` |
+| "check exported logs" | `ls PerSpec/Logs/` |
+| "view exported logs" | `cat PerSpec/Logs/ConsoleLogs_*.txt` |
+
 ## 🚀 TDD Development Workflow
 
 > **THIS IS THE CORE OF DEVELOPMENT** - All features must follow this workflow!
@@ -131,13 +134,13 @@ grep -E "passed|failed|errors" PerSpec/TestResults/*.xml
 ```bash
 # Step 1: Write code and tests with TDD
 # Step 2: Refresh Unity
-python PerSpec/scripts/refresh.py full --wait
+python PerSpec/Coordination/Scripts/quick_refresh.py full --wait
 
 # Step 3: Check for compilation errors (MUST be clean)
-python PerSpec/scripts/logs.py errors
+python PerSpec/Coordination/Scripts/quick_logs.py errors
 
 # Step 4: Run tests
-python PerSpec/scripts/test.py all -p edit --wait
+python PerSpec/Coordination/Scripts/quick_test.py all -p edit --wait
 ```
 
 ### 🔄 TDD Development Cycle
@@ -206,19 +209,19 @@ public class DataProcessor : MonoBehaviour {
 
 **B. Refresh Unity**
 ```bash
-python PerSpec/scripts/refresh.py full --wait
+python PerSpec/Coordination/Scripts/quick_refresh.py full --wait
 # Wait for "Refresh completed" confirmation
 ```
 
 **C. Check Compilation**
 ```bash
-python PerSpec/scripts/logs.py errors
+python PerSpec/Coordination/Scripts/quick_logs.py errors
 # Must show "No errors found" before proceeding
 ```
 
 **D. Run Tests**
 ```bash
-python PerSpec/scripts/test.py all -p edit --wait
+python PerSpec/Coordination/Scripts/quick_test.py all -p edit --wait
 # If tests fail, return to step A
 # Repeat cycle until all tests pass
 ```
@@ -257,11 +260,11 @@ PerSpecDebug.LogFeatureError("FEATURE", "Critical error (always log)");
 
 | Error | Fix | Command to Verify |
 |-------|-----|-------------------|
-| CS1626 (yield in try) | Use `UniTask.ToCoroutine()` | `logs.py errors` |
-| UniTask not found | Add to asmdef references | `refresh.py full --wait` |
-| async void | Convert to `UniTask`/`UniTaskVoid` | `logs.py errors` |
-| Thread error | `UniTask.SwitchToMainThread()` | `test.py` |
-| Test timeout | Add timeout attribute or check async | `test.py -v` |
+| CS1626 (yield in try) | Use `UniTask.ToCoroutine()` | `quick_logs.py errors` |
+| UniTask not found | Add to asmdef references | `quick_refresh.py full --wait` |
+| async void | Convert to `UniTask`/`UniTaskVoid` | `quick_logs.py errors` |
+| Thread error | `UniTask.SwitchToMainThread()` | `quick_test.py` |
+| Test timeout | Add timeout attribute or check async | `quick_test.py -v` |
 
 ## 🎯 Project Overview
 
@@ -288,13 +291,11 @@ TestFramework/
 │       └── PerSpec/               # PerSpec test directories (with asmdef)
 ├── PerSpec/                        # Working directory (writable)
 │   ├── test_coordination.db       # SQLite database
-│   ├── Scripts/                   # Convenience wrappers  
+│   ├── Coordination/
+│   │   └── Scripts/               # Python coordination scripts
 │   ├── TestResults/               # Test execution results (XML files)
-│   ├── package_location.txt       # Current package path
+│   ├── package_location.txt       # Package path reference
 │   └── package_info.json          # Package information
-├── ScriptingTools/
-│   └── Coordination/
-│       └── Scripts/               # Python coordination tools
 └── CustomScripts/
     └── Output/                    # Generated files go here
         ├── Reports/
@@ -655,7 +656,7 @@ public IEnumerator TestWithUniTask() => UniTask.ToCoroutine(async () => {
 
 ### 📚 Documentation References
 - Test execution guides in `Packages/com.digitraver.perspec/Documentation/`
-- Coordination tools in `PerSpec/scripts/` (wrapper scripts)
+- Coordination scripts in `PerSpec/Coordination/Scripts/`
 - PerSpec working directory: `PerSpec/` (project root)
 
 ## 📚 Documentation & Guides
@@ -690,12 +691,12 @@ public IEnumerator TestWithUniTask() => UniTask.ToCoroutine(async () => {
 
 ### Test Coordination System
 
-**PerSpec Coordination** (`PerSpec/scripts/`)
+**PerSpec Coordination** (`PerSpec/Coordination/Scripts/`)
 - SQLite database in `PerSpec/test_coordination.db`
 - Python tools for Unity control:
-  - `refresh.py` - Refresh Unity assets
-  - `test.py` - Execute tests
-  - `logs.py` - View Unity console logs
+  - `quick_refresh.py` - Refresh Unity assets
+  - `quick_test.py` - Execute tests
+  - `quick_logs.py` - View Unity console logs
   - `console_log_reader.py` - Read captured logs
 
 **Background Processing** (`Packages/com.perspec.framework/Editor/Coordination/`)
