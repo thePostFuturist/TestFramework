@@ -11,7 +11,8 @@
       "Bash(sed:*)",
       "Bash(done)",
       "Bash(find:*)",
-      "WebFetch(domain:docs.unity3d.com)"
+      "WebFetch(domain:docs.unity3d.com)",
+      "Bash(git check-ignore:*)"
     ],
     "deny": [],
     "ask": [],

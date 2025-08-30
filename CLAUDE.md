@@ -18,16 +18,28 @@
 
 ## 🔍 Quick Start - Finding PerSpec
 
-> **IMPORTANT**: Always dynamically locate the PerSpec package to handle PackageCache hash changes!
+> **IMPORTANT**: Always read the package location from the tracking file FIRST!
 
 ### Finding the Package Location
 ```bash
-# Find PerSpec package location (use this FIRST when working with PerSpec)
-find Packages Library/PackageCache -name "com.digitraver.perspec*" -type d 2>/dev/null | head -1
+# STEP 1: Read the package location from the tracking file (ALWAYS DO THIS FIRST)
+if [ -f "PerSpec/package_location.txt" ]; then
+    PACKAGE_PATH=$(head -n 1 PerSpec/package_location.txt)
+    echo "Package found at: $PACKAGE_PATH"
+else
+    echo "Location file not found, searching..."
+    # STEP 2: Fallback - Find PerSpec package location dynamically
+    PACKAGE_PATH=$(find Packages Library/PackageCache -name "com.digitraver.perspec*" -type d 2>/dev/null | head -1)
+    echo "Package found at: $PACKAGE_PATH"
+fi
 
-# Alternative: Using ls
-ls -d Packages/com.digitraver.perspec 2>/dev/null || ls -d Library/PackageCache/com.digitraver.perspec@* 2>/dev/null | head -1
+# For one-liner usage:
+PACKAGE_PATH=$(head -n 1 PerSpec/package_location.txt 2>/dev/null || find Packages Library/PackageCache -name "com.digitraver.perspec*" -type d 2>/dev/null | head -1)
 ```
+
+### Package Info Files
+- **`PerSpec/package_location.txt`** - Contains the current package path (first line)
+- **`PerSpec/package_info.json`** - JSON format with full package information
 
 ### Working with PerSpec Scripts
 ```bash
@@ -36,6 +48,17 @@ ls -d Packages/com.digitraver.perspec 2>/dev/null || ls -d Library/PackageCache/
 python PerSpec/scripts/refresh.py full --wait
 python PerSpec/scripts/test.py all -p edit --wait
 python PerSpec/scripts/logs.py errors
+```
+
+### Accessing Package Files Directly
+```bash
+# When you need to read or edit package files, ALWAYS get the path first:
+PACKAGE_PATH=$(head -n 1 PerSpec/package_location.txt 2>/dev/null)
+
+# Then use it to access files:
+cat "$PACKAGE_PATH/Documentation/unity-test-guide.md"
+ls "$PACKAGE_PATH/ScriptingTools/Coordination/Scripts/"
+python "$PACKAGE_PATH/ScriptingTools/Coordination/Scripts/quick_logs.py" errors
 ```
 
 > **Note**: The PerSpec/scripts directory contains wrapper scripts that dynamically locate the actual Python scripts in the package. These wrappers are self-healing and will find the package even after Unity reinstalls with new cache hashes.
@@ -65,6 +88,39 @@ python PerSpec/scripts/logs.py errors
   python PerSpec/scripts/logs.py latest -n 20
   python PerSpec/scripts/refresh.py full --wait
   ```
+
+## 📊 Test Results Location
+
+> **IMPORTANT**: All test results are automatically saved to `PerSpec/TestResults/`
+
+### Finding Test Results
+```bash
+# List all test result files
+ls PerSpec/TestResults/*.xml
+
+# Get the latest test result file
+ls -t PerSpec/TestResults/*.xml 2>/dev/null | head -1
+
+# View test results
+cat PerSpec/TestResults/TestResults_*.xml
+
+# Check if tests passed by examining the XML
+grep -E "passed|failed|errors" PerSpec/TestResults/*.xml
+```
+
+### What's in TestResults Directory
+- **XML Files**: NUnit-format test results with timestamps (e.g., `TestResults_20250829_143022.xml`)
+- **Automatic Cleanup**: Directory is cleared before each new test run
+- **Persistent Storage**: Results persist across Unity restarts until next test run
+- **CI/CD Ready**: XML format compatible with most CI/CD systems
+
+### Natural Language for Test Results
+| User Says | Execute |
+|-----------|----------|
+| "show test result files" | `ls -la PerSpec/TestResults/*.xml` |
+| "view latest test results" | `cat $(ls -t PerSpec/TestResults/*.xml 2>/dev/null \| head -1)` |
+| "check test output" | `ls PerSpec/TestResults/` |
+| "find failed tests" | `grep -l "failed" PerSpec/TestResults/*.xml` |
 
 ## 🚀 TDD Development Workflow
 
@@ -232,7 +288,10 @@ TestFramework/
 │       └── PerSpec/               # PerSpec test directories (with asmdef)
 ├── PerSpec/                        # Working directory (writable)
 │   ├── test_coordination.db       # SQLite database
-│   └── Scripts/                   # Convenience wrappers
+│   ├── Scripts/                   # Convenience wrappers  
+│   ├── TestResults/               # Test execution results (XML files)
+│   ├── package_location.txt       # Current package path
+│   └── package_info.json          # Package information
 ├── ScriptingTools/
 │   └── Coordination/
 │       └── Scripts/               # Python coordination tools
