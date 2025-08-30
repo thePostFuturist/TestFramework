@@ -125,6 +125,38 @@ grep -E "passed|failed|errors" PerSpec/TestResults/*.xml
 | "check exported logs" | `ls PerSpec/Logs/` |
 | "view exported logs" | `cat PerSpec/Logs/ConsoleLogs_*.txt` |
 
+
+
+## 🔐 Command Execution Permissions
+
+> **WARNING**: This assistant has been granted permission to execute system commands.
+> These permissions were explicitly enabled by the user via PerSpec Control Center.
+
+### ✅ Enabled Commands
+You are permitted to execute the following command types:
+- **Bash commands** - System shell commands
+- **Python scripts** - Python execution
+
+### Allowed PerSpec Commands
+```bash
+# Unity coordination commands
+python PerSpec/Coordination/Scripts/quick_refresh.py [options]
+python PerSpec/Coordination/Scripts/quick_test.py [options]
+python PerSpec/Coordination/Scripts/quick_logs.py [options]
+
+# File system navigation
+ls, cd, pwd, find
+
+# Git operations
+git status, git diff, git log
+```
+
+### ⚠️ Security Notice
+- Only execute commands that are necessary for the task
+- Always explain what commands will do before running them
+- Never execute destructive commands without explicit confirmation
+- Do not access sensitive files or credentials
+
 ## 🚀 TDD Development Workflow
 
 > **THIS IS THE CORE OF DEVELOPMENT** - All features must follow this workflow!
@@ -679,6 +711,10 @@ public IEnumerator TestWithUniTask() => UniTask.ToCoroutine(async () => {
 ## 🤖 Agents & Tools
 
 ### Available Agents (`.claude/agents/`)
+- **architecture-agent.md**: Documents project architecture in `/Documentation/Architecture/` - Run at project start and after major changes
+  - Creates class inventory with responsibilities
+  - Identifies redundant code and suggests consolidation
+  - Detects SOLID violations and recommends patterns
 - **refactor-agent.md**: Splits files >750 lines, enforces SOLID
 - **batch-refactor-agent.md**: Batch processes C# files, adds regions, converts async void
 - **dots-performance-profiler.md**: Analyzes DOTS/ECS performance
