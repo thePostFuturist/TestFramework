@@ -13,7 +13,8 @@
       "Bash(find:*)",
       "WebFetch(domain:docs.unity3d.com)",
       "Bash(git check-ignore:*)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Read(C:\\Users\\thepo\\AppData\\LocalLow\\DefaultCompany\\TestFramework/**)"
     ],
     "deny": [],
     "ask": [],
