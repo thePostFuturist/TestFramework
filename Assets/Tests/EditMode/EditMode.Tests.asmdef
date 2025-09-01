@@ -1,20 +1,16 @@
 {
-    "name": "PlayMode.Tests",
-    "rootNamespace": "Tests.PlayMode",
+    "name": "EditMode.Tests",
+    "rootNamespace": "Tests.EditMode",
     "references": [
         "PerSpec.Runtime",
         "PerSpec.Runtime.Debug",
-        "PerSpec.Runtime.DOTS",
         "UniTask",
-        "Unity.Entities",
-        "Unity.Collections",
-        "Unity.Jobs",
-        "Unity.Burst",
-        "Unity.Mathematics",
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner"
     ],
-    "includePlatforms": [],
+    "includePlatforms": [
+        "Editor"
+    ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": true,

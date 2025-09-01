@@ -215,7 +215,8 @@ wsl bash ./script.sh
 **Problem**: Windows paths with backslashes cause issues in bash scripts
 ```bash
 # ❌ This fails on Windows
-readonly PROJECT_ROOT="D:\Dev\TestFramework"
+readonly PROJECT_ROOT="D:\\Dev\\Tes
+tFramework"
 
 # ✅ Use forward slashes or let bash resolve paths
 readonly PROJECT_ROOT="$(pwd)"
