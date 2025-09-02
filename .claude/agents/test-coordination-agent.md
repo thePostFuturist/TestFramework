@@ -43,7 +43,7 @@ assistant: "I'll use the test-coordination-agent to coordinate asset refresh via
 
 ### Python Interface
 ```python
-from Coordination.Scripts.test_coordinator import TestCoordinator, TestPlatform, TestRequestType
+from test_coordinator import TestCoordinator, TestPlatform, TestRequestType  # Located in PerSpec/Coordination/Scripts/
 
 coordinator = TestCoordinator()
 request_id = coordinator.submit_test_request(
@@ -85,25 +85,25 @@ BackgroundPoller.EnableBackgroundPolling()
 
 ### Database Connection Issues
 1. Check SQLiteManager errors in Unity Console
-2. Verify database at `Coordination/test_coordination.db`
+2. Verify database at `PerSpec/test_coordination.db`
 3. Test connection: "Test Coordination > Debug > Test Database Connection"
 
 **Quick Commands:**
 ```bash
 # Run all PlayMode tests
-python Coordination/Scripts/quick_test.py all -p play --wait
+python PerSpec/Coordination/Scripts/quick_test.py all -p play --wait
 
 # Check status
-python Coordination/Scripts/quick_test.py status
+python PerSpec/Coordination/Scripts/quick_test.py status
 
 # Run specific test class
-python Coordination/Scripts/quick_test.py class MyTestClass -p edit
+python PerSpec/Coordination/Scripts/quick_test.py class MyTestClass -p edit
 
 # Submit asset refresh
-python Coordination/Scripts/quick_refresh.py full --wait
+python PerSpec/Coordination/Scripts/quick_refresh.py full --wait
 
 # Monitor database
-python Coordination/Scripts/db_monitor.py
+python PerSpec/Coordination/Scripts/monitor.py
 ```
 
 **Threading Patterns:**
@@ -129,13 +129,13 @@ After coordination setup, validate via **[4-Step Process](../../CLAUDE.md#test-d
 **Test Coordination Commands:**
 ```bash
 # Initialize database
-python Coordination/Scripts/db_initializer.py
+python PerSpec/Coordination/Scripts/db_initializer.py
 
 # Submit and wait for completion
-python Coordination/Scripts/quick_test.py all -p both --wait
+python PerSpec/Coordination/Scripts/quick_test.py all -p both --wait
 
 # Check specific request
-python Coordination/Scripts/quick_test.py status 1
+python PerSpec/Coordination/Scripts/quick_test.py status 1
 ```
 
 **Debug Menu Items:**
@@ -146,11 +146,11 @@ python Coordination/Scripts/quick_test.py status 1
 - Test Coordination > Background Polling > Force Script Compilation
 
 **Key Files:**
-- `Coordination/Scripts/test_coordinator.py` - Python interface
-- `Assets/TestCoordination/Editor/TestCoordinatorEditor.cs` - Unity polling
-- `Assets/TestCoordination/Editor/BackgroundPoller.cs` - Background processing
-- `Assets/TestCoordination/Editor/TestExecutor.cs` - Test execution
-- `Assets/TestCoordination/Editor/SQLiteManager.cs` - Database operations
+- `PerSpec/Coordination/Scripts/quick_test.py` - Python test interface
+- `Packages/com.perspec.framework/Editor/Coordination/Windows/TestCoordinatorEditor.cs` - Unity polling
+- `Packages/com.perspec.framework/Editor/Coordination/Core/BackgroundPoller.cs` - Background processing
+- `Packages/com.perspec.framework/Editor/Coordination/Core/TestExecutor.cs` - Test execution
+- `Packages/com.perspec.framework/Editor/Coordination/Core/SQLiteManager.cs` - Database operations
 
 **Performance Metrics:**
 - 1-second polling interval (adjustable)

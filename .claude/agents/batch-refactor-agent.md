@@ -51,7 +51,7 @@ assistant: "I'll use the batch-refactor-agent to convert all async void methods 
 
 **Refactoring Operations:**
 
-> **📚 Script Template Reference**: Use patterns from `../../CustomScripts/README.md` for Windows compatibility
+> **📚 Script Template Reference**: Use patterns from `CustomScripts/README.md` in project root for Windows compatibility
 
 ### Convert Async Void to UniTask (Cross-Platform)
 ```bash
@@ -120,7 +120,7 @@ using System.Threading;
 using UnityEngine;
 using UnityEngine.TestTools;
 using Cysharp.Threading.Tasks;
-using TestFramework.Unity.Core;
+using PerSpec.Runtime.Unity;
 
 namespace ${namespace}.Tests
 {

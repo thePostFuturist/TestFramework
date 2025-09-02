@@ -120,11 +120,11 @@ grep -c "if \|else\|while\|for\|switch" *.cs
 ```
 
 **Workflow:**
-After refactoring, validate via **[4-Step Process](../../CLAUDE.md#test-development-workflow)**.
+After refactoring, validate via the 4-Step Process documented in project CLAUDE.md.
 
 **Refactor Validation:**
-- Run ALL tests after refactoring: `quick_test.py all -p both --wait`
-- Check affected classes: `quick_test.py class <RefactoredClass>Tests -p edit --wait`
+- Run ALL tests after refactoring: `python PerSpec/Coordination/Scripts/quick_test.py all -p both --wait`
+- Check affected classes: `python PerSpec/Coordination/Scripts/quick_test.py class <RefactoredClass>Tests -p edit --wait`
 
 **Post-Refactor Checklist:**
 ✅ Files <750 lines
@@ -133,6 +133,6 @@ After refactoring, validate via **[4-Step Process](../../CLAUDE.md#test-developm
 ✅ No async void
 ✅ SOLID maintained
 
-**Common Issues:** See error table in [CLAUDE.md](../../CLAUDE.md#test-development-workflow)
+**Common Issues:** See error table in project CLAUDE.md
 
 ---

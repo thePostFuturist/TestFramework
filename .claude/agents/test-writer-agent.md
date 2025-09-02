@@ -26,11 +26,11 @@ assistant: "Let me launch the test-writer-agent to research Unity integration te
 - TDD methodology for Unity components
 
 **Primary References:**
-- `Assets/TestFramework/Unity/UNIFIED_TEST_EXECUTION_GUIDE.md` - Core testing patterns
-- `Assets/TestFramework/DOTS/DOTS_TEST_EXECUTION_GUIDE.md` - ECS/DOTS testing
-- `Assets/TestFramework/Unity/Core/UniTaskTestBase.cs` - Base test class
-- `Assets/TestFramework/DOTS/Core/DOTSTestBase.cs` - DOTS base class
-- `CLAUDE.md` - Project-specific testing requirements
+- Unity test guide in package documentation - Core testing patterns
+- DOTS test guide in package documentation - ECS/DOTS testing
+- `Packages/com.perspec.framework/Runtime/Unity/Core/UniTaskTestBase.cs` - Base test class
+- `Packages/com.perspec.framework/Runtime/DOTS/Core/DOTSTestBase.cs` - DOTS base class
+- Project `CLAUDE.md` - Project-specific testing requirements
 
 **Responsibilities:**
 1. Research Unity testing patterns via web search
@@ -52,12 +52,12 @@ assistant: "Let me launch the test-writer-agent to research Unity integration te
 
 **Test Structure Requirements:**
 
-Follow existing test patterns in:
-- `Assets/TestFramework/Tests/PlayMode/SampleSystemPrefabTests.cs`
-- Use prefab factories from `Assets/TestFramework/Editor/PrefabFactories/`
+Follow existing test patterns:
+- Use prefab factory pattern for Unity components
+- Create prefab factories in Editor scripts
 - Inherit from appropriate base class (UniTaskTestBase/DOTSTestBase)
 
-**Key Testing Rules (from CLAUDE.md):**
+**Key Testing Rules (from project CLAUDE.md):**
 1. ALWAYS use UniTask.ToCoroutine() for async tests
 2. NEVER use async void - use UniTask/UniTaskVoid
 3. ALWAYS use FindVars pattern for component setup
@@ -90,17 +90,17 @@ Follow existing test patterns in:
 - Performance benchmarks where applicable
 
 **Workflow:**
-After writing tests, execute **[4-Step Process](../../CLAUDE.md#test-development-workflow)**.
+After writing tests, execute the 4-Step Process documented in project CLAUDE.md.
 
 **Test-Specific Commands:**
 ```bash
 # Run new test class
-python Coordination/Scripts/quick_test.py class <NewTestClass> -p edit --wait
+python PerSpec/Coordination/Scripts/quick_test.py class <NewTestClass> -p edit --wait
 
 # Run category
-python Coordination/Scripts/quick_test.py category <Category> -p edit --wait
+python PerSpec/Coordination/Scripts/quick_test.py category <Category> -p edit --wait
 ```
 
-**Common Test Errors:** See error table in [CLAUDE.md](../../CLAUDE.md#test-development-workflow)
+**Common Test Errors:** See error table in project CLAUDE.md
 
 ---
