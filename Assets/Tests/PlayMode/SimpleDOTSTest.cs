@@ -242,6 +242,35 @@ namespace Tests.PlayMode
             Debug.Log("[DOTS-TEST] Cancellation test completed");
         });
         
+        [UnityTest]
+        public IEnumerator TestSimpleDOTSSystem() => RunAsyncTest(async () =>
+        {
+            Debug.Log("[DOTS-TEST] Starting DOTS system test with DefaultGameObjectInjectionWorld");
+            
+            // Ensure the default world is set for this test
+            EnsureDefaultWorldIsSet();
+            
+            // Now code that expects DefaultGameObjectInjectionWorld will work
+            Assert.IsNotNull(World.DefaultGameObjectInjectionWorld, "DefaultGameObjectInjectionWorld should be set");
+            Assert.AreEqual(testWorld, World.DefaultGameObjectInjectionWorld, "Test world should be the default");
+            
+            // Create an entity using the default world's entity manager
+            var defaultEntityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+            var entity = defaultEntityManager.CreateEntity(ComponentType.ReadWrite<TestComponent>());
+            
+            Assert.IsTrue(defaultEntityManager.Exists(entity), "Entity should exist in default world");
+            
+            // Set and verify component data
+            defaultEntityManager.SetComponentData(entity, new TestComponent { value = 100f, counter = 50 });
+            await UniTask.Yield();
+            
+            var data = defaultEntityManager.GetComponentData<TestComponent>(entity);
+            Assert.AreEqual(100f, data.value, 0.01f, "Value should be 100");
+            Assert.AreEqual(50, data.counter, "Counter should be 50");
+            
+            Debug.Log("[DOTS-TEST] Successfully tested with DefaultGameObjectInjectionWorld");
+        });
+        
         #endregion
     }
 }
