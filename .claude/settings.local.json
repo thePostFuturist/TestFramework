@@ -15,7 +15,9 @@
       "Bash(git check-ignore:*)",
       "Bash(grep:*)",
       "Read(C:\\Users\\thepo\\AppData\\LocalLow\\DefaultCompany\\TestFramework/**)",
-      "Bash(dir:*)"
+      "Bash(dir:*)",
+      "Bash(cat:*)",
+      "Bash(sqlite3:*)"
     ],
     "deny": [],
     "ask": [],
