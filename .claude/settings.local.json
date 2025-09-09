@@ -17,7 +17,8 @@
       "Read(C:\\Users\\thepo\\AppData\\LocalLow\\DefaultCompany\\TestFramework/**)",
       "Bash(dir:*)",
       "Bash(cat:*)",
-      "Bash(sqlite3:*)"
+      "Bash(sqlite3:*)",
+      "Read(//c/Users/thepo/AppData/LocalLow/DefaultCompany/TestFramework/**)"
     ],
     "deny": [],
     "ask": [],

@@ -23,14 +23,19 @@ Packages/com.digitraver.perspec/    # Package location
 
 ## 🗣️ Natural Language Commands
 
-| User Says | Execute |
-|-----------|---------|
-| "show/get errors" | `python PerSpec/Coordination/Scripts/quick_logs.py errors` |
-| "run tests" | `python PerSpec/Coordination/Scripts/quick_test.py all -p edit --wait` |
-| "refresh Unity" | `python PerSpec/Coordination/Scripts/quick_refresh.py full --wait` |
-| "show logs" | `python PerSpec/Coordination/Scripts/quick_logs.py latest -n 50` |
-| "export logs" | `python PerSpec/Coordination/Scripts/quick_logs.py export` |
-| "test results" | `cat $(ls -t PerSpec/TestResults/*.xml 2>/dev/null \| head -1)` |
+| User Says           | Execute                                                                                     |
+| ------------------- | ------------------------------------------------------------------------------------------- |
+| "show/get errors"   | `python PerSpec/Coordination/Scripts/monitor_logs.py recent -m 10 --level Error`            |
+| "run tests"         | `python PerSpec/Coordination/Scripts/quick_test.py all -p edit --wait`                      |
+| "refresh Unity"     | `python PerSpec/Coordination/Scripts/quick_refresh.py full --wait`                          |
+| "show logs"         | `python PerSpec/Coordination/Scripts/monitor_logs.py recent -m 60 -n 50`                    |
+| "export logs"       | `python PerSpec/Coordination/Scripts/monitor_logs.py export -o logs.json`                   |
+| "monitor logs live" | `python PerSpec/Coordination/Scripts/monitor_logs.py live -r 1`                             |
+| "test results"      | `cat $(ls -t PerSpec/TestResults/*.xml 2>/dev/null \| head -1)`                             |
+| "open console"      | `python PerSpec/Coordination/Scripts/quick_menu.py execute "Window/General/Console" --wait` |
+| "save project"      | `python PerSpec/Coordination/Scripts/quick_menu.py execute "File/Save Project" --wait`      |
+| "clear logs"        | `python PerSpec/Coordination/Scripts/quick_clean.py quick`                                  |
+| "clean database"    | `python PerSpec/Coordination/Scripts/quick_clean.py all --keep 0.5`                         |
 
 **Intent Mapping:**
 - "Something wrong" → Check errors
@@ -38,19 +43,103 @@ Packages/com.digitraver.perspec/    # Package location
 - "Unity not responding" → Refresh Unity
 - **Timeout?** → Tell user to click Unity window for focus
 - **DOTS world null?** → Ensure using DOTSTestBase
+- **Database too large?** → Run: `quick_clean.py quick`
+
+## 📊 Log Monitoring with monitor_logs.py
+
+### Real-time Monitoring
+```bash
+# Monitor logs as they happen
+python PerSpec/Coordination/Scripts/monitor_logs.py live -r 1
+
+# Filter by log level
+python PerSpec/Coordination/Scripts/monitor_logs.py live -r 1 --level Error Warning
+
+# Show all sessions (not just current)
+python PerSpec/Coordination/Scripts/monitor_logs.py live -r 1 --all
+```
+
+### View Recent Logs
+```bash
+# Show last 10 minutes of logs
+python PerSpec/Coordination/Scripts/monitor_logs.py recent -m 10 -n 50
+
+# Show only errors from last 5 minutes
+python PerSpec/Coordination/Scripts/monitor_logs.py recent -m 5 --level Error
+
+# Show errors and warnings
+python PerSpec/Coordination/Scripts/monitor_logs.py recent -m 10 --level Error Warning
+```
+
+### Analyze & Export
+```bash
+# Analyze error patterns
+python PerSpec/Coordination/Scripts/monitor_logs.py analyze -h 1
+
+# Export logs to JSON
+python PerSpec/Coordination/Scripts/monitor_logs.py export -o logs.json -h 2
+
+# Export to text format
+python PerSpec/Coordination/Scripts/monitor_logs.py export -o logs.txt -h 2 -f txt
+
+# View session information
+python PerSpec/Coordination/Scripts/monitor_logs.py sessions
+
+# Clean old logs
+python PerSpec/Coordination/Scripts/monitor_logs.py cleanup -d 7
+```
+
+**Note:** Unity stores timestamps as UTC ticks. The monitor_logs script automatically handles timezone conversion for correct local time display.
+
+## 🗑️ Database Maintenance
+
+### Manual Cleanup Commands
+```bash
+# Quick cleanup (clear all logs + compact database)
+python PerSpec/Coordination/Scripts/quick_clean.py quick
+
+# Clear only console logs
+python PerSpec/Coordination/Scripts/quick_clean.py logs --keep 0
+
+# Clean all old data (keep last 30 minutes)
+python PerSpec/Coordination/Scripts/quick_clean.py all --keep 0.5
+
+# Show database statistics
+python PerSpec/Coordination/Scripts/quick_clean.py stats
+```
+
+### Automatic Settings
+- Console logs retention: **30 minutes**
+- Cleanup frequency: **Every 15 minutes**
+- Database size trigger: **50 MB**
+
+### After Package Updates
+```bash
+# Run migration to add new tables
+python PerSpec/Coordination/Scripts/db_migrate.py
+```
 
 ## 🚀 TDD Workflow
 
-### 📌 4-Step Process (REQUIRED)
+### 📌 4-Step Process (REQUIRED - DO NOT SKIP STEPS!)
 ```bash
 # 1. Write tests & code
 # 2. Refresh Unity
 python PerSpec/Coordination/Scripts/quick_refresh.py full --wait
-# 3. Check compilation
-python PerSpec/Coordination/Scripts/quick_logs.py errors
-# 4. Run tests
+
+# 3. ⚠️ MANDATORY: Check compilation errors
+python PerSpec/Coordination/Scripts/monitor_logs.py recent -m 5 --level Error
+# STOP HERE if any errors! Fix compilation FIRST!
+# Tests will be INCONCLUSIVE if code doesn't compile
+
+# 4. Run tests ONLY after successful compilation
 python PerSpec/Coordination/Scripts/quick_test.py all -p edit --wait
 ```
+
+**🚨 CRITICAL**: If compilation errors exist:
+- Tests cannot run and will be marked INCONCLUSIVE
+- You MUST fix compilation errors before running tests
+- Check errors with: `python PerSpec/Coordination/Scripts/monitor_logs.py recent -m 5 --level Error`
 
 ### 🎯 Test Execution
 ```bash
@@ -325,7 +414,57 @@ PerSpecDebug.LogError("error message - always important");
 ❌ Compiler directives in tests  
 ❌ Skip TDD steps  
 
+## 🎮 Unity Menu Execution
+
+### Execute Unity Menu Items from Python
+```bash
+# List available menu items
+python PerSpec/Coordination/Scripts/quick_menu.py list
+
+# Execute a menu item
+python PerSpec/Coordination/Scripts/quick_menu.py execute "Menu/Path" --wait
+
+# Check status of request
+python PerSpec/Coordination/Scripts/quick_menu.py status <request_id>
+
+# Cancel pending request
+python PerSpec/Coordination/Scripts/quick_menu.py cancel <request_id>
+```
+
+### Common Menu Items
+| Menu Path | Purpose |
+|-----------|---------|
+| `Assets/Refresh` | Refresh asset database |
+| `Assets/Create/C# Script` | Create new C# script |
+| `Assets/Create/Folder` | Create new folder |
+| `File/Save Project` | Save all project files |
+| `Edit/Play` | Enter play mode |
+| `Edit/Pause` | Pause play mode |
+| `Edit/Stop` | Exit play mode |
+| `Window/General/Console` | Open console window |
+| `Window/General/Test Runner` | Open test runner |
+
+**Notes:**
+- Menu items that open dialogs will timeout after 30 seconds
+- Use `--wait` flag to wait for completion
+- Use `--timeout N` to set custom timeout in seconds
+- Higher priority requests execute first
+
 ## 📊 Quick Reference
+
+### Compilation Error Handling
+| Situation | Action | Command |
+|-----------|--------|---------|
+| After refresh | ALWAYS check errors | `monitor_logs.py recent -m 5 --level Error` |
+| Errors found | FIX before testing | Do NOT run tests |
+| Tests show "inconclusive" | Check compilation | `monitor_logs.py recent -m 5 --level Error` |
+| Tests timeout | Check Unity focus + errors | Click Unity + check errors |
+
+**Test Result States:**
+- **PASSED**: Test executed and succeeded
+- **FAILED**: Test executed but assertion failed  
+- **INCONCLUSIVE**: Test couldn't run (compilation error/timeout)
+- **SKIPPED**: Test intentionally not run
 
 ### Error Fixes
 | Error | Solution |
@@ -364,6 +503,8 @@ TestFramework/
 > **Test prefabs?** Use Editor scripts
 <!-- PERSPEC_CONFIG_END -->
 <!-- PERSPEC_CONFIG_END -->
+<!-- PERSPEC_CONFIG_END -->
+
 
 ## 🔐 Command Execution Permissions
 
