@@ -66,6 +66,9 @@ python PerSpec/Coordination/Scripts/monitor_editmode_logs.py live
 
 # List all sessions (keeps 3 most recent)
 python PerSpec/Coordination/Scripts/monitor_editmode_logs.py sessions
+
+# Bypass line limit for grep/filtering (useful for searching)
+python PerSpec/Coordination/Scripts/monitor_editmode_logs.py --no-limit | grep "PATTERN"
 ```
 
 ### PlayMode Logs
@@ -81,6 +84,9 @@ python PerSpec/Coordination/Scripts/test_playmode_logs.py -l
 
 # View with stack traces
 python PerSpec/Coordination/Scripts/test_playmode_logs.py -s --errors
+
+# Bypass default 50 line limit for grep/filtering
+python PerSpec/Coordination/Scripts/test_playmode_logs.py --no-limit | grep "PATTERN"
 ```
 
 **Note:** Logs are now stored as files, not in database. EditMode keeps 3 sessions, PlayMode clears on entry.
