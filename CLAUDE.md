@@ -1,4 +1,12 @@
-<!-- PERSPEC_CONFIG_START -->
+## 🚨 CRITICAL: Package-Only Edits
+**ALWAYS edit files in the package location ONLY:**
+- ✅ Edit: `Packages/com.digitraver.perspec/...`
+- ❌ NEVER edit: `PerSpec/...` (these are auto-synced from package)
+
+The `PerSpec/` directory is automatically synchronized from the package.
+Any edits outside the package will be lost on next sync.
+
+
 <!-- PERSPEC_CONFIG_START -->
 # CLAUDE.md
 
@@ -135,6 +143,20 @@ python PerSpec/Coordination/Scripts/monitor_editmode_logs.py --errors
 # 4. Run tests ONLY after successful compilation
 python PerSpec/Coordination/Scripts/quick_test.py all -p edit --wait
 ```
+
+### ⚠️ Understanding Test Status
+**IMPORTANT**: The "completed" status means:
+- ✅ Test request was processed by Unity
+- ✅ Test results XML file was found and parsed
+- ❌ NOT that tests finished executing in Unity
+
+The `--wait` flag only waits for the request to be processed, not for test execution to complete.
+Unity may still be running tests even after status shows "completed".
+
+To ensure tests are truly finished:
+1. Check Unity Test Runner window visually
+2. Look for "Test run finished" in Unity console
+3. Check if Unity Editor is still busy (spinner in tab)
 
 **🚨 CRITICAL**: If compilation errors exist:
 - Tests cannot run and will be marked INCONCLUSIVE
@@ -520,14 +542,6 @@ TestFramework/
 > **Errors?** Log with context  
 > **Test prefabs?** Use Editor scripts
 <!-- PERSPEC_CONFIG_END -->
-<!-- PERSPEC_CONFIG_END -->
-<!-- PERSPEC_CONFIG_END -->
-<!-- PERSPEC_CONFIG_END -->
-<!-- PERSPEC_CONFIG_END -->
-<!-- PERSPEC_CONFIG_END -->
-<!-- PERSPEC_CONFIG_END -->
-
-
 
 
 
