@@ -8,6 +8,7 @@ Any edits outside the package will be lost on next sync.
 
 
 <!-- PERSPEC_CONFIG_START -->
+<!-- PERSPEC_CONFIG_START -->
 # CLAUDE.md
 
 > **Purpose**: TDD guidance for Claude Code in Unity projects using PerSpec framework.
@@ -39,7 +40,9 @@ Packages/com.digitraver.perspec/    # Package location
 | "show logs"         | `python PerSpec/Coordination/Scripts/monitor_editmode_logs.py recent -n 50`                |
 | "export logs"       | `python PerSpec/Coordination/Scripts/monitor_editmode_logs.py sessions`                     |
 | "monitor logs live" | `python PerSpec/Coordination/Scripts/monitor_editmode_logs.py live`                         |
-| "test results"      | `cat $(ls -t PerSpec/TestResults/*.xml 2>/dev/null \| head -1)`                             |
+| "test results"      | `python PerSpec/Coordination/Scripts/test_results.py latest`                                |
+| "show test results" | `python PerSpec/Coordination/Scripts/test_results.py latest -v`                             |
+| "failed tests"      | `python PerSpec/Coordination/Scripts/test_results.py failed`                                |
 | "open console"      | `python PerSpec/Coordination/Scripts/quick_menu.py execute "Window/General/Console" --wait` |
 | "save project"      | `python PerSpec/Coordination/Scripts/quick_menu.py execute "File/Save Project" --wait`      |
 | "clear logs"        | `python PerSpec/Coordination/Scripts/quick_clean.py quick`                                  |
@@ -63,10 +66,13 @@ Packages/com.digitraver.perspec/    # Package location
 # View recent logs from current session
 python PerSpec/Coordination/Scripts/monitor_editmode_logs.py recent -n 50
 
-# Show only errors and exceptions from all sessions
+# Show only compilation errors (CS errors) from all sessions
 python PerSpec/Coordination/Scripts/monitor_editmode_logs.py --errors
 
-# Show errors with stack traces
+# Show ALL errors and exceptions from all sessions
+python PerSpec/Coordination/Scripts/monitor_editmode_logs.py --all-errors
+
+# Show compilation errors with stack traces
 python PerSpec/Coordination/Scripts/monitor_editmode_logs.py --errors -s
 
 # Monitor logs in real-time
@@ -84,20 +90,57 @@ python PerSpec/Coordination/Scripts/monitor_editmode_logs.py --no-limit | grep "
 # View PlayMode logs
 python PerSpec/Coordination/Scripts/test_playmode_logs.py
 
-# Show only errors and exceptions
+# Show only compilation errors (CS errors)
 python PerSpec/Coordination/Scripts/test_playmode_logs.py --errors
+
+# Show ALL errors and exceptions
+python PerSpec/Coordination/Scripts/test_playmode_logs.py --all-errors
 
 # List available sessions
 python PerSpec/Coordination/Scripts/test_playmode_logs.py -l
 
-# View with stack traces
+# View compilation errors with stack traces
 python PerSpec/Coordination/Scripts/test_playmode_logs.py -s --errors
+
+# View all errors with stack traces
+python PerSpec/Coordination/Scripts/test_playmode_logs.py -s --all-errors
 
 # Bypass default 50 line limit for grep/filtering
 python PerSpec/Coordination/Scripts/test_playmode_logs.py --no-limit | grep "PATTERN"
 ```
 
 **Note:** Logs are now stored as files, not in database. EditMode keeps 3 sessions, PlayMode clears on entry.
+
+## 📈 Test Results Viewer
+
+### View Test Results
+```bash
+# Show latest test results with summary
+python PerSpec/Coordination/Scripts/test_results.py latest
+
+# Show latest with detailed output (all tests)
+python PerSpec/Coordination/Scripts/test_results.py latest -v
+
+# Show latest as JSON
+python PerSpec/Coordination/Scripts/test_results.py latest --json
+
+# List available test result files
+python PerSpec/Coordination/Scripts/test_results.py list -n 20
+
+# Show specific test result file
+python PerSpec/Coordination/Scripts/test_results.py show TestResults_20250912_141430.xml -v
+
+# Show only failed tests from recent runs
+python PerSpec/Coordination/Scripts/test_results.py failed -n 5 -v
+
+# Show statistics from recent test runs
+python PerSpec/Coordination/Scripts/test_results.py stats -n 10
+
+# Clean old test result files (keep 10 most recent)
+python PerSpec/Coordination/Scripts/test_results.py clean --keep 10 --confirm
+```
+
+**Note:** Test results are stored as XML files in `PerSpec/TestResults/`. The viewer parses these files to show test outcomes, durations, and failure details.
 
 ## 🗑️ Database Maintenance
 
@@ -125,7 +168,15 @@ python PerSpec/Coordination/Scripts/quick_clean.py stats
 ```bash
 # Run migration to add new tables
 python PerSpec/Coordination/Scripts/db_migrate.py
+
+# Update status constraint for new test states (if needed)
+python PerSpec/Coordination/Scripts/db_update_status_constraint.py
 ```
+
+**When to run db_update_status_constraint.py:**
+- After updating from older PerSpec versions
+- If you see errors like: `CHECK constraint failed: status IN ('pending', 'running', 'completed', 'failed', 'cancelled')`
+- When tests show wrong status or complete prematurely
 
 ## 🚀 TDD Workflow
 
@@ -524,7 +575,8 @@ TestFramework/
 - **Compilation**: Errors captured even during compilation failures
 - **View logs**: `python PerSpec/Coordination/Scripts/monitor_editmode_logs.py`
   - `recent -n 50` - Show last 50 logs
-  - `errors` - Show only errors
+  - `--errors` - Show only compilation errors (CS errors)
+  - `--all-errors` - Show all errors and exceptions
   - `live` - Monitor in real-time
   - `sessions` - List all sessions
 
@@ -542,6 +594,8 @@ TestFramework/
 > **Errors?** Log with context  
 > **Test prefabs?** Use Editor scripts
 <!-- PERSPEC_CONFIG_END -->
+<!-- PERSPEC_CONFIG_END -->
+
 
 
 
