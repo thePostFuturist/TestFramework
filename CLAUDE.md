@@ -86,6 +86,11 @@ Packages/com.digitraver.perspec/    # Package location
 | "clean database"    | `python PerSpec/Coordination/Scripts/quick_clean.py all --keep 0.5`                         |
 | "show playmode logs"| `python PerSpec/Coordination/Scripts/test_playmode_logs.py`                                 |
 | "show playmode errors"| `python PerSpec/Coordination/Scripts/test_playmode_logs.py --errors`                       |
+| "export scene"      | `python PerSpec/Coordination/Scripts/scene_hierarchy.py export full --wait`                 |
+| "export hierarchy"  | `python PerSpec/Coordination/Scripts/scene_hierarchy.py export full --wait --show`          |
+| "export gameobject" | `python PerSpec/Coordination/Scripts/scene_hierarchy.py export object <path> --wait`        |
+| "show scene json"   | `python PerSpec/Coordination/Scripts/scene_hierarchy.py latest --show`                      |
+| "list scene exports"| `python PerSpec/Coordination/Scripts/scene_hierarchy.py list`                               |
 
 **Intent Mapping:**
 - "Something wrong" → Check errors
@@ -312,6 +317,41 @@ Task(refactor-agent): "Prepare existing code for inventory"
 Edit: Fix null check on line 42
 Read: Show PlayerController
 ```
+
+## 🌳 Scene Hierarchy Export
+
+### Export Unity Scene to JSON
+```bash
+# Export full scene hierarchy
+python PerSpec/Coordination/Scripts/scene_hierarchy.py export full --wait
+
+# Export specific GameObject and its children
+python PerSpec/Coordination/Scripts/scene_hierarchy.py export object "Player" --wait
+
+# Export and display JSON
+python PerSpec/Coordination/Scripts/scene_hierarchy.py export full --wait --show
+
+# View latest export
+python PerSpec/Coordination/Scripts/scene_hierarchy.py latest --show
+
+# List export files
+python PerSpec/Coordination/Scripts/scene_hierarchy.py list
+```
+
+### JSON Output Features
+- **Full component serialization** - No GUIDs, actual script names and values
+- **Transform data** - Position, rotation, scale arrays
+- **Component properties** - Serialized using Unity's SerializedObject
+- **Recursive hierarchy** - Complete GameObject tree with children
+- **Inactive GameObjects** - Optional inclusion (use `--no-inactive` to exclude)
+
+### Setup Required (One-Time)
+```bash
+# Add scene hierarchy table to database
+python PerSpec/Coordination/Scripts/add_scene_hierarchy_table.py
+```
+
+**Output Location:** `PerSpec/SceneHierarchy/hierarchy_[timestamp].json`
 
 ## 📖 Documentation Access
 
@@ -658,7 +698,6 @@ TestFramework/
 ## 📝 Critical Reminders
 
 > **🔴 BEFORE RUNNING TESTS:** ALWAYS refresh Unity AND check for errors!  
-> **📦 Made package changes?** Update version + CHANGELOG.md!  
 > **Pivoting?** Ask user first  
 > **New directory?** Needs asmdef  
 > **Errors?** Log with context  
@@ -667,6 +706,10 @@ TestFramework/
 <!-- PERSPEC_CONFIG_END -->
 <!-- PERSPEC_CONFIG_END -->
 <!-- PERSPEC_CONFIG_END -->
+<!-- PERSPEC_CONFIG_END -->
+<!-- PERSPEC_CONFIG_END -->
+
+
 
 
 
