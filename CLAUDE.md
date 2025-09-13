@@ -6,6 +6,43 @@
 The `PerSpec/` directory is automatically synchronized from the package.
 Any edits outside the package will be lost on next sync.
 
+## 📦 Package Version Management
+
+### When to Update Version
+| Change Type | Version Bump | Example |
+|------------|--------------|----------|
+| Bug fixes | Patch (x.x.1) | 1.2.0 → 1.2.1 |
+| New features | Minor (x.1.x) | 1.2.0 → 1.3.0 |
+| Breaking changes | Major (1.x.x) | 1.2.0 → 2.0.0 |
+
+### Required Updates for ANY Package Changes:
+1. **Update package.json version**:
+   ```json
+   "version": "1.2.1",  // Increment appropriately
+   ```
+
+2. **Add CHANGELOG.md entry** with:
+   - Version number and date
+   - Section headers: Added, Fixed, Changed, Improved
+   - Clear description of changes
+   - Technical details for fixes
+
+### Changelog Template:
+```markdown
+## [1.2.1] - YYYY-MM-DD
+
+### Fixed
+- **Issue Title**
+  - What was broken
+  - How it was fixed
+  - Technical details if relevant
+
+### Added
+- **Feature Name**
+  - What it does
+  - How to use it
+```
+
 
 <!-- PERSPEC_CONFIG_START -->
 <!-- PERSPEC_CONFIG_START -->
@@ -180,20 +217,39 @@ python PerSpec/Coordination/Scripts/db_update_status_constraint.py
 
 ## 🚀 TDD Workflow
 
-### 📌 4-Step Process (REQUIRED - DO NOT SKIP STEPS!)
+### 🛑 CRITICAL: NEVER SKIP THESE STEPS!
+**⚠️ WARNING**: Skipping ANY step will cause test failures and waste time!
+
+### 📌 MANDATORY 4-Step Process (ALWAYS FOLLOW IN ORDER!)
 ```bash
 # 1. Write tests & code
-# 2. Refresh Unity
-python PerSpec/Coordination/Scripts/quick_refresh.py full --wait
 
-# 3. ⚠️ MANDATORY: Check compilation errors
+# 2. ⚡ ALWAYS REFRESH UNITY FIRST! (DO NOT SKIP!)
+python PerSpec/Coordination/Scripts/quick_refresh.py full --wait
+# ❌ NEVER run tests without refreshing - Unity won't see your changes!
+
+# 3. 🚨 MANDATORY: Check compilation errors (NEVER SKIP THIS!)
 python PerSpec/Coordination/Scripts/monitor_editmode_logs.py --errors
-# STOP HERE if any errors! Fix compilation FIRST!
+# ⛔ STOP HERE if ANY errors exist!
+# ❌ DO NOT PROCEED to step 4 if compilation errors exist!
 # Tests will be INCONCLUSIVE if code doesn't compile
 
-# 4. Run tests ONLY after successful compilation
+# 4. Run tests ONLY after steps 2 & 3 succeed
 python PerSpec/Coordination/Scripts/quick_test.py all -p edit --wait
 ```
+
+### ❌ COMMON MISTAKES TO AVOID:
+- **Running tests without refreshing Unity** → Tests run old code
+- **Skipping error check** → Tests show INCONCLUSIVE
+- **Running tests with compilation errors** → Wastes time, tests can't run
+- **Not waiting for refresh to complete** → Tests run partially updated code
+
+### 📋 Step-by-Step Checklist (USE THIS EVERY TIME!):
+☐ Code written/modified
+☐ Unity refreshed (`quick_refresh.py full --wait`)
+☐ Compilation checked (`monitor_editmode_logs.py --errors`)
+☐ No errors found (or all fixed)
+☐ Tests executed (`quick_test.py`)
 
 ### ⚠️ Understanding Test Status
 **IMPORTANT**: The "completed" status means:
@@ -209,10 +265,15 @@ To ensure tests are truly finished:
 2. Look for "Test run finished" in Unity console
 3. Check if Unity Editor is still busy (spinner in tab)
 
-**🚨 CRITICAL**: If compilation errors exist:
-- Tests cannot run and will be marked INCONCLUSIVE
-- You MUST fix compilation errors before running tests
-- Check errors with: `python PerSpec/Coordination/Scripts/monitor_editmode_logs.py --errors`
+**🚨 CRITICAL PROTOCOL**: 
+1. **ALWAYS** refresh Unity after ANY code change
+2. **ALWAYS** check for compilation errors BEFORE running tests
+3. **NEVER** skip the error check - even for "simple" changes
+4. If compilation errors exist:
+   - Tests CANNOT run and will be marked INCONCLUSIVE
+   - You MUST fix ALL compilation errors before running tests
+   - Check errors with: `python PerSpec/Coordination/Scripts/monitor_editmode_logs.py --errors`
+   - After fixing errors, go back to step 2 (refresh Unity)
 
 ### 🎯 Test Execution
 ```bash
@@ -525,10 +586,17 @@ python PerSpec/Coordination/Scripts/quick_menu.py cancel <request_id>
 
 ## 📊 Quick Reference
 
+### 🔴 STOP! Before Running ANY Test:
+1. Did you refresh Unity? → If no, run `quick_refresh.py full --wait`
+2. Did you check for errors? → If no, run `monitor_editmode_logs.py --errors`
+3. Are there compilation errors? → If yes, FIX THEM FIRST
+4. Only NOW can you run tests → `quick_test.py all -p edit --wait`
+
 ### Compilation Error Handling
 | Situation | Action | Command |
 |-----------|--------|---------|
-| After refresh | ALWAYS check errors | `monitor_editmode_logs.py --errors` |
+| **BEFORE ANY TEST** | **ALWAYS refresh Unity** | `quick_refresh.py full --wait` |
+| **After EVERY refresh** | **ALWAYS check errors** | `monitor_editmode_logs.py --errors` |
 | Errors found | FIX before testing | Do NOT run tests |
 | Tests show "inconclusive" | Check compilation | `monitor_editmode_logs.py --errors` |
 | Tests timeout | Check Unity focus + errors | Click Unity + check errors |
@@ -587,14 +655,19 @@ TestFramework/
 - **dots-performance-profiler**: DOTS/ECS analysis
 - **architecture-agent**: Document architecture
 
-## 📝 Reminders
+## 📝 Critical Reminders
 
+> **🔴 BEFORE RUNNING TESTS:** ALWAYS refresh Unity AND check for errors!  
+> **📦 Made package changes?** Update version + CHANGELOG.md!  
 > **Pivoting?** Ask user first  
 > **New directory?** Needs asmdef  
 > **Errors?** Log with context  
-> **Test prefabs?** Use Editor scripts
+> **Test prefabs?** Use Editor scripts  
+> **Tests failing?** Did you refresh Unity? Did you check for compilation errors?
 <!-- PERSPEC_CONFIG_END -->
 <!-- PERSPEC_CONFIG_END -->
+<!-- PERSPEC_CONFIG_END -->
+
 
 
 
