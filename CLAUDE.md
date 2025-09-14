@@ -6,6 +6,12 @@
 The `PerSpec/` directory is automatically synchronized from the package.
 Any edits outside the package will be lost on next sync.
 
+### ⚠️ Python Scripts Location
+- **Package location**: `Packages/com.digitraver.perspec/Editor/Coordination/Scripts/` - EDIT HERE
+- **Working copy**: `PerSpec/Coordination/Scripts/` - DO NOT EDIT (auto-copied from package)
+- Python scripts in PerSpec are COPIES that will be automatically synchronized
+- NEVER work directly in `PerSpec/Coordination/Scripts/`
+
 ## 📦 Package Version Management
 
 ### When to Update Version
