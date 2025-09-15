@@ -1,4 +1,11 @@
-## 🚨 CRITICAL: Package-Only Edits
+## 🔴🔴🔴 CRITICAL: PYTHON SCRIPTS - SINGLE SOURCE OF TRUTH 🔴🔴🔴
+**ETCH THIS IN YOUR FUCKING FOREHEAD:**
+- **ONLY ONE SOURCE**: `Packages/com.digitraver.perspec/Editor/Coordination/Scripts/`
+- **THIS IS THE ONLY PLACE PYTHON SCRIPTS SHOULD EXIST IN THE PACKAGE**
+- **IF A SCRIPT DOESN'T EXIST THERE, DELETE IT FROM PerSpec**
+- **NO OTHER DIRECTORIES SHOULD CONTAIN PYTHON COORDINATION SCRIPTS**
+
+### 🚨 CRITICAL: Package-Only Edits
 **ALWAYS edit files in the package location ONLY:**
 - ✅ Edit: `Packages/com.digitraver.perspec/...`
 - ❌ NEVER edit: `PerSpec/...` (these are auto-synced from package)
@@ -7,8 +14,9 @@ The `PerSpec/` directory is automatically synchronized from the package.
 Any edits outside the package will be lost on next sync.
 
 ### ⚠️ Python Scripts Location
-- **Package location**: `Packages/com.digitraver.perspec/Editor/Coordination/Scripts/` - EDIT HERE
+- **SINGLE PACKAGE SOURCE**: `Packages/com.digitraver.perspec/Editor/Coordination/Scripts/` - ALL SCRIPTS HERE
 - **Working copy**: `PerSpec/Coordination/Scripts/` - DO NOT EDIT (auto-copied from package)
+- **Sync script**: `Packages/com.digitraver.perspec/ScriptingTools/sync_python_scripts.py`
 - Python scripts in PerSpec are COPIES that will be automatically synchronized
 - NEVER work directly in `PerSpec/Coordination/Scripts/`
 
@@ -68,15 +76,38 @@ Any edits outside the package will be lost on next sync.
 
 ```bash
 # Fixed paths for reliability
-PerSpec/Coordination/Scripts/       # Python coordination tools
+PerSpec/Coordination/Scripts/       # Python coordination tools (synced from package)
 PerSpec/package_location.txt        # Package path reference
-Packages/com.digitraver.perspec/    # Package location
+Packages/com.digitraver.perspec/    # Package location (source of truth)
 ```
+
+### 🔄 Python Script Synchronization
+
+**SYNC COMMAND - USE THIS TO COPY PYTHON SCRIPTS:**
+```bash
+# ALWAYS run this to sync Python scripts from package to PerSpec
+python Packages/com.digitraver.perspec/ScriptingTools/sync_python_scripts.py
+
+# This copies ALL scripts from:
+#   Packages/com.digitraver.perspec/Editor/Coordination/Scripts/  (ONLY SOURCE)
+# To:
+#   PerSpec/Coordination/Scripts/  (working directory)
+```
+
+**When to sync:**
+- **After package updates** - ALWAYS
+- **After pulling from git** - ALWAYS
+- **If scripts are missing/outdated** - ALWAYS
+- **When setting up project** - FIRST THING
+- **If --errors fix doesn't work** - RUN SYNC
 
 ## 🗣️ Natural Language Commands
 
 | User Says           | Execute                                                                                     |
 | ------------------- | ------------------------------------------------------------------------------------------- |
+| "sync python"       | `python Packages/com.digitraver.perspec/ScriptingTools/sync_python_scripts.py`              |
+| "copy python scripts"| `python Packages/com.digitraver.perspec/ScriptingTools/sync_python_scripts.py`              |
+| "LLM setup"         | `python Packages/com.digitraver.perspec/ScriptingTools/sync_python_scripts.py`              |
 | "show/get errors"   | `python PerSpec/Coordination/Scripts/monitor_editmode_logs.py --errors`                     |
 | "run tests"         | `python PerSpec/Coordination/Scripts/quick_test.py all -p edit --wait`                      |
 | "refresh Unity"     | `python PerSpec/Coordination/Scripts/quick_refresh.py full --wait`                          |
@@ -92,6 +123,7 @@ Packages/com.digitraver.perspec/    # Package location
 | "clean database"    | `python PerSpec/Coordination/Scripts/quick_clean.py all --keep 0.5`                         |
 | "show playmode logs"| `python PerSpec/Coordination/Scripts/test_playmode_logs.py`                                 |
 | "show playmode errors"| `python PerSpec/Coordination/Scripts/test_playmode_logs.py --errors`                       |
+| "show cs errors"    | `python PerSpec/Coordination/Scripts/test_playmode_logs.py --cs-errors`                     |
 | "export scene"      | `python PerSpec/Coordination/Scripts/scene_hierarchy.py export full --wait`                 |
 | "export hierarchy"  | `python PerSpec/Coordination/Scripts/scene_hierarchy.py export full --wait --show`          |
 | "export gameobject" | `python PerSpec/Coordination/Scripts/scene_hierarchy.py export object <path> --wait`        |
@@ -135,29 +167,40 @@ python PerSpec/Coordination/Scripts/monitor_editmode_logs.py --no-limit | grep "
 
 ### PlayMode Logs
 ```bash
-# View PlayMode logs
+# View PlayMode logs (last 50 by default)
 python PerSpec/Coordination/Scripts/test_playmode_logs.py
 
-# Show only compilation errors (CS errors)
+# Show ALL errors and exceptions (runtime + compilation)
 python PerSpec/Coordination/Scripts/test_playmode_logs.py --errors
 
-# Show ALL errors and exceptions
-python PerSpec/Coordination/Scripts/test_playmode_logs.py --all-errors
+# Show ONLY compilation errors (CS errors)
+python PerSpec/Coordination/Scripts/test_playmode_logs.py --cs-errors
 
 # List available sessions
 python PerSpec/Coordination/Scripts/test_playmode_logs.py -l
 
-# View compilation errors with stack traces
-python PerSpec/Coordination/Scripts/test_playmode_logs.py -s --errors
+# View errors with stack traces
+python PerSpec/Coordination/Scripts/test_playmode_logs.py --errors -s
 
-# View all errors with stack traces
-python PerSpec/Coordination/Scripts/test_playmode_logs.py -s --all-errors
+# View compilation errors with stack traces
+python PerSpec/Coordination/Scripts/test_playmode_logs.py --cs-errors -s
+
+# Show all logs without limit
+python PerSpec/Coordination/Scripts/test_playmode_logs.py -a
 
 # Bypass default 50 line limit for grep/filtering
 python PerSpec/Coordination/Scripts/test_playmode_logs.py --no-limit | grep "PATTERN"
+
+# Show most recent session only
+python PerSpec/Coordination/Scripts/test_playmode_logs.py --tail
 ```
 
-**Note:** Logs are now stored as files, not in database. EditMode keeps 3 sessions, PlayMode clears on entry.
+**Important Changes:**
+- `--errors` now shows ALL errors (runtime + compilation) - more useful for PlayMode debugging
+- `--cs-errors` for compilation errors only (what --errors used to do)
+- `--all-errors` is deprecated (same as --errors)
+
+**Note:** Logs are stored as files in `PerSpec/PlayModeLogs/`. PlayMode logs clear on entry, captured every 5 seconds during play.
 
 ## 📈 Test Results Viewer
 
@@ -714,6 +757,8 @@ TestFramework/
 <!-- PERSPEC_CONFIG_END -->
 <!-- PERSPEC_CONFIG_END -->
 <!-- PERSPEC_CONFIG_END -->
+<!-- PERSPEC_CONFIG_END -->
+
 
 
 
