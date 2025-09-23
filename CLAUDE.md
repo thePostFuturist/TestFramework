@@ -124,6 +124,8 @@ python Packages/com.digitraver.perspec/ScriptingTools/sync_python_scripts.py
 | "show playmode logs"| `python PerSpec/Coordination/Scripts/test_playmode_logs.py`                                 |
 | "show playmode errors"| `python PerSpec/Coordination/Scripts/test_playmode_logs.py --errors`                       |
 | "show cs errors"    | `python PerSpec/Coordination/Scripts/test_playmode_logs.py --cs-errors`                     |
+| "search playmode logs"| `python PerSpec/Coordination/Scripts/test_playmode_logs.py --search <keyword>`             |
+| "find in logs"      | `python PerSpec/Coordination/Scripts/test_playmode_logs.py -S <keyword> -i`                 |
 | "export scene"      | `python PerSpec/Coordination/Scripts/scene_hierarchy.py export full --wait`                 |
 | "export hierarchy"  | `python PerSpec/Coordination/Scripts/scene_hierarchy.py export full --wait --show`          |
 | "export gameobject" | `python PerSpec/Coordination/Scripts/scene_hierarchy.py export object <path> --wait`        |
@@ -193,6 +195,13 @@ python PerSpec/Coordination/Scripts/test_playmode_logs.py --no-limit | grep "PAT
 
 # Show most recent session only
 python PerSpec/Coordination/Scripts/test_playmode_logs.py --tail
+
+# Search for keywords in logs
+python PerSpec/Coordination/Scripts/test_playmode_logs.py --search "error"
+python PerSpec/Coordination/Scripts/test_playmode_logs.py -S "timeout" "failed"  # ALL keywords must match
+python PerSpec/Coordination/Scripts/test_playmode_logs.py -S "player" "health" --any  # ANY keyword matches
+python PerSpec/Coordination/Scripts/test_playmode_logs.py --search "exception" -i  # Case-insensitive search
+python PerSpec/Coordination/Scripts/test_playmode_logs.py -S "null" --errors  # Search within errors only
 ```
 
 **Important Changes:**
