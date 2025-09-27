@@ -60,6 +60,14 @@ Any edits outside the package will be lost on next sync.
 
 <!-- PERSPEC_CONFIG_START -->
 <!-- PERSPEC_CONFIG_START -->
+
+## 🔴🔴🔴 CRITICAL: PYTHON SCRIPTS - SINGLE SOURCE OF TRUTH 🔴🔴🔴
+**ETCH THIS IN YOUR FUCKING FOREHEAD:**
+- **ONLY ONE SOURCE**: `Packages/com.digitraver.perspec/Editor/Coordination/Scripts/`
+- **THIS IS THE ONLY PLACE PYTHON SCRIPTS SHOULD EXIST IN THE PACKAGE**
+- **IF A SCRIPT DOESN'T EXIST THERE, DELETE IT FROM PerSpec**
+- **NO OTHER DIRECTORIES SHOULD CONTAIN PYTHON COORDINATION SCRIPTS**
+
 # CLAUDE.md
 
 > **Purpose**: TDD guidance for Claude Code in Unity projects using PerSpec framework.
@@ -75,31 +83,31 @@ Any edits outside the package will be lost on next sync.
 ## 🔍 Script Locations
 
 ```bash
-# Fixed paths for reliability
-PerSpec/Coordination/Scripts/       # Python coordination tools (synced from package)
+# SINGLE SOURCE OF TRUTH
+Packages/com.digitraver.perspec/Editor/Coordination/Scripts/  # ALL PYTHON SCRIPTS HERE ONLY
+PerSpec/Coordination/Scripts/       # Working copies (auto-synced, DO NOT EDIT)
 PerSpec/package_location.txt        # Package path reference
-Packages/com.digitraver.perspec/    # Package location (source of truth)
 ```
 
-### 🔄 Python Script Synchronization
+### 🔄 Python Script Synchronization - CRITICAL!
 
-**SYNC COMMAND - USE THIS TO COPY PYTHON SCRIPTS:**
+**THE SYNC COMMAND YOU MUST USE:**
 ```bash
 # ALWAYS run this to sync Python scripts from package to PerSpec
 python Packages/com.digitraver.perspec/ScriptingTools/sync_python_scripts.py
 
-# This copies ALL scripts from:
-#   Packages/com.digitraver.perspec/Editor/Coordination/Scripts/  (ONLY SOURCE)
+# This copies ALL 22 scripts from:
+#   Packages/com.digitraver.perspec/Editor/Coordination/Scripts/  (ONLY SOURCE - NO OTHER DIRS!)
 # To:
-#   PerSpec/Coordination/Scripts/  (working directory)
+#   PerSpec/Coordination/Scripts/  (working directory - DO NOT EDIT HERE)
 ```
 
 **When to sync:**
-- **After package updates** - ALWAYS
-- **After pulling from git** - ALWAYS
-- **If scripts are missing/outdated** - ALWAYS
-- **When setting up project** - FIRST THING
-- **If --errors fix doesn't work** - RUN SYNC
+- **After package updates** - MANDATORY
+- **After pulling from git** - MANDATORY
+- **When setting up project** - FIRST THING YOU DO
+- **If scripts are missing** - RUN SYNC
+- **If --errors doesn't work** - RUN SYNC FIRST
 
 ## 🗣️ Natural Language Commands
 
@@ -286,16 +294,20 @@ python PerSpec/Coordination/Scripts/db_update_status_constraint.py
 ### 📌 MANDATORY 4-Step Process (ALWAYS FOLLOW IN ORDER!)
 ```bash
 # 1. Write tests & code
+# 🔴 IMPORTANT: Steps 2 & 3 MUST also be run IMMEDIATELY after writing ANY code!
+# Don't wait until test time - verify compilation RIGHT AFTER coding!
 
 # 2. ⚡ ALWAYS REFRESH UNITY FIRST! (DO NOT SKIP!)
 python PerSpec/Coordination/Scripts/quick_refresh.py full --wait
 # ❌ NEVER run tests without refreshing - Unity won't see your changes!
+# 📌 Run this IMMEDIATELY after writing/editing ANY C# code!
 
 # 3. 🚨 MANDATORY: Check compilation errors (NEVER SKIP THIS!)
 python PerSpec/Coordination/Scripts/monitor_editmode_logs.py --errors
 # ⛔ STOP HERE if ANY errors exist!
 # ❌ DO NOT PROCEED to step 4 if compilation errors exist!
 # Tests will be INCONCLUSIVE if code doesn't compile
+# 📌 Run this IMMEDIATELY after EVERY refresh to verify code compiles!
 
 # 4. Run tests ONLY after steps 2 & 3 succeed
 python PerSpec/Coordination/Scripts/quick_test.py all -p edit --wait
@@ -349,6 +361,48 @@ quick_test.py class Tests.PlayMode.SimplePerSpecTest -p play --wait
 # Run specific METHOD
 quick_test.py method Tests.PlayMode.SimplePerSpecTest.Should_Pass -p play --wait
 ```
+
+## 🔍 Post-Code-Writing Verification (MANDATORY FOR LLMs)
+
+### 🚨 CRITICAL REQUIREMENT FOR ALL LLMs
+**After writing or modifying ANY C# code, you MUST IMMEDIATELY verify it compiles:**
+
+```bash
+# MANDATORY AFTER ANY CODE CHANGE - DO NOT SKIP!
+# 1. Refresh Unity to pick up changes
+python PerSpec/Coordination/Scripts/quick_refresh.py full --wait
+
+# 2. Check for compilation errors
+python PerSpec/Coordination/Scripts/monitor_editmode_logs.py --errors
+```
+
+### ⚠️ THIS APPLIES TO:
+- ✅ After creating new C# files
+- ✅ After editing existing C# code
+- ✅ After refactoring or renaming
+- ✅ After adding/removing using statements
+- ✅ After ANY code modification whatsoever
+
+### 📌 WHY THIS IS MANDATORY:
+- **Immediate feedback**: Catch errors before user discovers them
+- **Professional quality**: Ensure all delivered code compiles
+- **Time saving**: Fix issues immediately while context is fresh
+- **User trust**: Demonstrate thoroughness and professionalism
+
+### ❌ NEVER:
+- Skip verification "because it's a simple change"
+- Assume code compiles without checking
+- Wait for user to ask about errors
+- Leave compilation errors unfixed
+
+### ✅ ALWAYS:
+1. Write/modify code
+2. **IMMEDIATELY** run refresh
+3. **IMMEDIATELY** check for errors
+4. If errors exist, fix them NOW
+5. Re-verify after fixes
+
+**Remember**: The user expects working code. It's YOUR responsibility as an LLM to ensure code compiles BEFORE considering any task complete.
 
 ## 🤖 Agent Usage
 
@@ -464,6 +518,93 @@ public IEnumerator Should_TakeDamage() => UniTask.ToCoroutine(async () => {
 - Using reflection for private access
 - Making private methods public
 - Test parameters in production methods
+
+## 🚫 Compilation Error Fix Guidelines
+
+### ❌ NEVER Remove Functionality to "Fix" Errors
+```csharp
+// ❌ ABSOLUTELY FORBIDDEN - Removing functionality
+public void ProcessData() {
+    // TODO: Fix compilation issue
+    // var tracker = PipelineDistortionTracker.Instance;
+    // if (tracker != null) {
+    //     tracker.Track(data);
+    // }
+}
+
+// ❌ WRONG - Commenting out broken code
+public void Initialize() {
+    // systemManager.RegisterSystem(this);  // CS0103: The name 'systemManager' does not exist
+}
+
+// ✅ CORRECT - Fix the actual issue
+public void ProcessData() {
+    var tracker = PipelineDistortionTracker.Instance;  // Add proper using statement or reference
+    if (tracker != null) {
+        tracker.Track(data);
+    }
+}
+
+// ✅ CORRECT - Resolve missing dependencies
+private SystemManager systemManager;
+public void Initialize() {
+    systemManager = GetComponent<SystemManager>();
+    systemManager.RegisterSystem(this);
+}
+```
+
+### Proper Compilation Error Resolution
+| Error Type | ❌ WRONG Approach | ✅ CORRECT Approach |
+|------------|-------------------|---------------------|
+| Missing type | Comment out code | Add using statement or assembly reference |
+| Undefined variable | Remove functionality | Declare variable or inject dependency |
+| Method not found | Delete method call | Implement method or find correct API |
+| Interface not implemented | Remove interface | Implement all required methods |
+| Ambiguous reference | Comment out usage | Use fully qualified name |
+
+### Resolution Steps for Compilation Errors
+1. **Identify the root cause** - Don't just hide the symptom
+2. **Check for missing references**:
+   - Assembly references in .asmdef
+   - Using statements at top of file
+   - NuGet packages or dependencies
+3. **Research the proper API**:
+   - Check Unity documentation
+   - Look for similar usage in codebase
+   - Verify version compatibility
+4. **Implement proper solution**:
+   - Add missing dependencies
+   - Create required methods/properties
+   - Use correct namespace
+5. **NEVER**:
+   - Leave TODO comments for compilation fixes
+   - Comment out functional code
+   - Remove features to make it compile
+
+### Example: Fixing Missing Type Error
+```csharp
+// ❌ WRONG - Removing functionality
+public class GameManager : MonoBehaviour {
+    void Start() {
+        // TODO: Fix PipelineDistortionTracker not found
+        // InitializeTracker();
+    }
+}
+
+// ✅ CORRECT - Add proper reference
+using MyGame.Analytics;  // Add missing using
+
+public class GameManager : MonoBehaviour {
+    void Start() {
+        InitializeTracker();
+    }
+
+    void InitializeTracker() {
+        var tracker = PipelineDistortionTracker.Instance;
+        tracker.Initialize();
+    }
+}
+```
 
 ## ⚠️ Critical Patterns
 
@@ -632,19 +773,23 @@ PerSpecDebug.LogError("error message - always important");
 ## 🚨 Important Rules
 
 ### ALWAYS
-✅ Use UniTask (never Task/coroutines)  
-✅ Use FindVars for components  
-✅ Stay on main thread for Unity APIs  
-✅ Use test facades for private access  
-✅ Follow 4-step TDD workflow  
+✅ Use UniTask (never Task/coroutines)
+✅ Use FindVars for components
+✅ Stay on main thread for Unity APIs
+✅ Use test facades for private access
+✅ Follow 4-step TDD workflow
+✅ Fix compilation errors properly with real solutions
 
 ### NEVER
-❌ async void → Use UniTask/UniTaskVoid  
-❌ Singleton MonoBehaviours  
-❌ Runtime GetComponent  
-❌ Reflection for private access  
-❌ Compiler directives in tests  
-❌ Skip TDD steps  
+❌ async void → Use UniTask/UniTaskVoid
+❌ Singleton MonoBehaviours
+❌ Runtime GetComponent
+❌ Reflection for private access
+❌ Compiler directives in tests
+❌ Skip TDD steps
+❌ Comment out code to "fix" compilation errors
+❌ Remove functionality instead of fixing dependencies
+❌ Generate .meta files → Unity creates these automatically  
 
 ## 🎮 Unity Menu Execution
 
@@ -755,18 +900,23 @@ TestFramework/
 
 ## 📝 Critical Reminders
 
-> **🔴 BEFORE RUNNING TESTS:** ALWAYS refresh Unity AND check for errors!  
-> **Pivoting?** Ask user first  
-> **New directory?** Needs asmdef  
-> **Errors?** Log with context  
-> **Test prefabs?** Use Editor scripts  
+> **🔴 AFTER WRITING CODE:** IMMEDIATELY refresh Unity AND check for errors!
+> **🔴 BEFORE RUNNING TESTS:** ALWAYS refresh Unity AND check for errors!
+> **Finished editing?** Run verification NOW (refresh + error check)
+> **Pivoting?** Ask user first
+> **New directory?** Needs asmdef
+> **Errors?** Log with context
+> **Test prefabs?** Use Editor scripts
 > **Tests failing?** Did you refresh Unity? Did you check for compilation errors?
+> **Code complete?** Did you verify it compiles? NO EXCEPTIONS!
 <!-- PERSPEC_CONFIG_END -->
 <!-- PERSPEC_CONFIG_END -->
 <!-- PERSPEC_CONFIG_END -->
 <!-- PERSPEC_CONFIG_END -->
 <!-- PERSPEC_CONFIG_END -->
 <!-- PERSPEC_CONFIG_END -->
+<!-- PERSPEC_CONFIG_END -->
+
 
 
 
