@@ -61,15 +61,6 @@ Any edits outside the package will be lost on next sync.
 <!-- PERSPEC_CONFIG_START -->
 <!-- PERSPEC_CONFIG_START -->
 
-## 🔴🔴🔴 CRITICAL: PYTHON SCRIPTS - SINGLE SOURCE OF TRUTH 🔴🔴🔴
-**ETCH THIS IN YOUR FUCKING FOREHEAD:**
-- **ONLY ONE SOURCE**: `Packages/com.digitraver.perspec/Editor/Coordination/Scripts/`
-- **THIS IS THE ONLY PLACE PYTHON SCRIPTS SHOULD EXIST IN THE PACKAGE**
-- **IF A SCRIPT DOESN'T EXIST THERE, DELETE IT FROM PerSpec**
-- **NO OTHER DIRECTORIES SHOULD CONTAIN PYTHON COORDINATION SCRIPTS**
-
-# CLAUDE.md
-
 > **Purpose**: TDD guidance for Claude Code in Unity projects using PerSpec framework.
 
 ## 📋 Quick Navigation
@@ -917,6 +908,8 @@ TestFramework/
 <!-- PERSPEC_CONFIG_END -->
 <!-- PERSPEC_CONFIG_END -->
 <!-- PERSPEC_CONFIG_END -->
+<!-- PERSPEC_CONFIG_END -->
+
 
 
 

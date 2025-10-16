@@ -5,6 +5,7 @@
         "PerSpec.Runtime",
         "PerSpec.Runtime.Debug",
         "PerSpec.Runtime.DOTS",
+        "PerSpec.Editor.DOTS",
         "UniTask",
         "Unity.Entities",
         "Unity.Collections",

@@ -1,64 +1,3 @@
-## 🔴🔴🔴 CRITICAL: PYTHON SCRIPTS - SINGLE SOURCE OF TRUTH 🔴🔴🔴
-
-- **ONLY ONE SOURCE**: `Packages/com.digitraver.perspec/Editor/Coordination/Scripts/`
-- **THIS IS THE ONLY PLACE PYTHON SCRIPTS SHOULD EXIST IN THE PACKAGE**
-- **IF A SCRIPT DOESN'T EXIST THERE, DELETE IT FROM PerSpec**
-- **NO OTHER DIRECTORIES SHOULD CONTAIN PYTHON COORDINATION SCRIPTS**
-
-### 🚨 CRITICAL: Package-Only Edits
-**ALWAYS edit files in the package location ONLY:**
-- ✅ Edit: `Packages/com.digitraver.perspec/...`
-- ❌ NEVER edit: `PerSpec/...` (these are auto-synced from package)
-
-The `PerSpec/` directory is automatically synchronized from the package.
-Any edits outside the package will be lost on next sync.
-
-### ⚠️ Python Scripts Location
-- **SINGLE PACKAGE SOURCE**: `Packages/com.digitraver.perspec/Editor/Coordination/Scripts/` - ALL SCRIPTS HERE
-- **Working copy**: `PerSpec/Coordination/Scripts/` - DO NOT EDIT (auto-copied from package)
-- **Sync script**: `Packages/com.digitraver.perspec/ScriptingTools/sync_python_scripts.py`
-- Python scripts in PerSpec are COPIES that will be automatically synchronized
-- NEVER work directly in `PerSpec/Coordination/Scripts/`
-
-## 📦 Package Version Management
-
-### When to Update Version
-| Change Type | Version Bump | Example |
-|------------|--------------|----------|
-| Bug fixes | Patch (x.x.1) | 1.2.0 → 1.2.1 |
-| New features | Minor (x.1.x) | 1.2.0 → 1.3.0 |
-| Breaking changes | Major (1.x.x) | 1.2.0 → 2.0.0 |
-
-### Required Updates for ANY Package Changes:
-1. **Update package.json version**:
-   ```json
-   "version": "1.2.1",  // Increment appropriately
-   ```
-
-2. **Add CHANGELOG.md entry** with:
-    - Version number and date
-    - Section headers: Added, Fixed, Changed, Improved
-    - Clear description of changes
-    - Technical details for fixes
-
-### Changelog Template:
-```markdown
-## [1.2.1] - YYYY-MM-DD
-
-### Fixed
-- **Issue Title**
-  - What was broken
-  - How it was fixed
-  - Technical details if relevant
-
-### Added
-- **Feature Name**
-  - What it does
-  - How to use it
-```
-
-
-<!-- PERSPEC_CONFIG_START -->
 <!-- PERSPEC_CONFIG_START -->
 
 > **Purpose**: TDD guidance for Claude Code in Unity projects using PerSpec framework.
@@ -900,5 +839,4 @@ TestFramework/
 > **Test prefabs?** Use Editor scripts
 > **Tests failing?** Did you refresh Unity? Did you check for compilation errors?
 > **Code complete?** Did you verify it compiles? NO EXCEPTIONS!
-<!-- PERSPEC_CONFIG_END -->
 <!-- PERSPEC_CONFIG_END -->

@@ -9,7 +9,7 @@ using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.TestTools;
 using Cysharp.Threading.Tasks;
-using PerSpec.Runtime.DOTS;
+using PerSpec.Editor.DOTS;
 
 namespace Tests.PlayMode
 {
