@@ -853,15 +853,6 @@ TestFramework/
 # PERSPEC_CONFIG_START
 <!-- PERSPEC_CONFIG_START -->
 
-## 🔴🔴🔴 CRITICAL: PYTHON SCRIPTS - SINGLE SOURCE OF TRUTH 🔴🔴🔴
-**ETCH THIS IN YOUR FUCKING FOREHEAD:**
-- **ONLY ONE SOURCE**: `Packages/com.digitraver.perspec/Editor/Coordination/Scripts/`
-- **THIS IS THE ONLY PLACE PYTHON SCRIPTS SHOULD EXIST IN THE PACKAGE**
-- **IF A SCRIPT DOESN'T EXIST THERE, DELETE IT FROM PerSpec**
-- **NO OTHER DIRECTORIES SHOULD CONTAIN PYTHON COORDINATION SCRIPTS**
-
-# CLAUDE.md
-
 > **Purpose**: TDD guidance for Claude Code in Unity projects using PerSpec framework.
 
 ## 📋 Quick Navigation
@@ -1416,7 +1407,7 @@ public IEnumerator GoodTest() => UniTask.ToCoroutine(async () => {
     try {
         await UniTask.Delay(1000);
     } catch (Exception ex) {
-        PerSpecDebug.LogError($"[ERROR] {ex.Message}");
+        Debug.LogError($"[ERROR] {ex.Message}");
         throw;
     }
 });
@@ -1536,30 +1527,6 @@ public IEnumerator TestName() => UniTask.ToCoroutine(async () => {
         if (instance) Object.DestroyImmediate(instance);
     }
 });
-```
-
-## 📝 Logging
-
-```csharp
-using PerSpec;
-
-// Test-specific logs
-PerSpecDebug.LogTestSetup("setup phase");
-PerSpecDebug.LogTestAction("action phase");
-PerSpecDebug.LogTestAssert("assertion phase");
-PerSpecDebug.LogTestComplete("test completed");
-PerSpecDebug.LogTestError("test failed");
-
-// Feature-specific logs (two parameters: feature name, message)
-PerSpecDebug.LogFeatureStart("AUTH", "Starting authentication");
-PerSpecDebug.LogFeatureProgress("AUTH", "Validating token");
-PerSpecDebug.LogFeatureComplete("AUTH", "Login successful");
-PerSpecDebug.LogFeatureError("AUTH", "Invalid credentials");
-
-// General logs
-PerSpecDebug.Log("general message");
-PerSpecDebug.LogWarning("warning message");
-PerSpecDebug.LogError("error message - always important");
 ```
 
 ## 🚨 Important Rules

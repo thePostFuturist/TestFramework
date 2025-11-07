@@ -615,7 +615,7 @@ public IEnumerator GoodTest() => UniTask.ToCoroutine(async () => {
     try {
         await UniTask.Delay(1000);
     } catch (Exception ex) {
-        PerSpecDebug.LogError($"[ERROR] {ex.Message}");
+        Debug.LogError($"[ERROR] {ex.Message}");
         throw;
     }
 });
@@ -735,30 +735,6 @@ public IEnumerator TestName() => UniTask.ToCoroutine(async () => {
         if (instance) Object.DestroyImmediate(instance);
     }
 });
-```
-
-## 📝 Logging
-
-```csharp
-using PerSpec;
-
-// Test-specific logs
-PerSpecDebug.LogTestSetup("setup phase");
-PerSpecDebug.LogTestAction("action phase");
-PerSpecDebug.LogTestAssert("assertion phase");
-PerSpecDebug.LogTestComplete("test completed");
-PerSpecDebug.LogTestError("test failed");
-
-// Feature-specific logs (two parameters: feature name, message)
-PerSpecDebug.LogFeatureStart("AUTH", "Starting authentication");
-PerSpecDebug.LogFeatureProgress("AUTH", "Validating token");
-PerSpecDebug.LogFeatureComplete("AUTH", "Login successful");
-PerSpecDebug.LogFeatureError("AUTH", "Invalid credentials");
-
-// General logs
-PerSpecDebug.Log("general message");
-PerSpecDebug.LogWarning("warning message");
-PerSpecDebug.LogError("error message - always important");
 ```
 
 ## 🚨 Important Rules
@@ -900,5 +876,6 @@ TestFramework/
 > **Test prefabs?** Use Editor scripts
 > **Tests failing?** Did you refresh Unity? Did you check for compilation errors?
 > **Code complete?** Did you verify it compiles? NO EXCEPTIONS!
+<!-- PERSPEC_CONFIG_END -->
 <!-- PERSPEC_CONFIG_END -->
 <!-- PERSPEC_CONFIG_END -->
