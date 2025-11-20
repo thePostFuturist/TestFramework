@@ -130,15 +130,20 @@ python Packages/com.digitraver.perspec/ScriptingTools/sync_python_scripts.py
 | "export gameobject" | `python PerSpec/Coordination/Scripts/scene_hierarchy.py export object <path> --wait`        |
 | "show scene json"   | `python PerSpec/Coordination/Scripts/scene_hierarchy.py latest --show`                      |
 | "list scene exports"| `python PerSpec/Coordination/Scripts/scene_hierarchy.py list`                               |
+| "enable DOTS"       | Open Control Center > Debug Settings > Click "Enable DOTS Support"                          |
+| "check DOTS status" | Open Control Center > Dashboard > Check "DOTS Support" row                                  |
+| "write DOTS test"   | First check if DOTS is enabled, then use DOTSTestBase with #if PERSPEC_DOTS_ENABLED         |
 
 **Intent Mapping:**
 - "Something wrong" → Check errors
 - "Tests failing" → Run with verbose: `quick_test.py all -v --wait`
 - "Unity not responding" → Refresh Unity
 - **Timeout?** → Tell user to click Unity window for focus
-- **DOTS world null?** → Ensure using DOTSTestBase
+- **DOTS world null?** → Ensure using DOTSTestBase AND DOTS is enabled
 - **Database too large?** → Run: `quick_clean.py quick`
 - **PlayMode logs?** → Check `PerSpec/PlayModeLogs/` directory
+- **Writing DOTS code?** → FIRST check if `PERSPEC_DOTS_ENABLED` is set
+- **DOTSTestBase not found?** → Enable DOTS support in Control Center
 
 ## 📊 Log Monitoring
 
@@ -394,6 +399,24 @@ python PerSpec/Coordination/Scripts/monitor_editmode_logs.py --errors
 5. Re-verify after fixes
 
 **Remember**: The user expects working code. It's YOUR responsibility as an LLM to ensure code compiles BEFORE considering any task complete.
+
+### 🎯 Natural Language Prompt Recognition
+
+**IMPORTANT**: As an LLM, you should recognize these natural language prompts from the user and automatically execute the corresponding commands:
+
+| User Says | Your Action | Execute |
+|-----------|-------------|---------|
+| "refresh Unity" | Immediately refresh Unity assets and compile | `python PerSpec/Coordination/Scripts/quick_refresh.py full --wait` |
+| "show errors" or "get errors" | Check for compilation errors | `python PerSpec/Coordination/Scripts/monitor_editmode_logs.py --errors` |
+| "run tests" | Execute test suite | `python PerSpec/Coordination/Scripts/quick_test.py all -p edit --wait` |
+
+**Automatic Triggering**: After writing or modifying ANY C# code:
+1. You MUST automatically execute "refresh Unity" (without waiting for user prompt)
+2. You MUST automatically execute "show errors" (without waiting for user prompt)
+3. Only proceed with other tasks if no compilation errors exist
+4. If errors exist, fix them immediately and repeat steps 1-2
+
+This is NOT optional - it is a MANDATORY part of your workflow as an LLM assistant working with Unity code.
 
 ## 🤖 Agent Usage
 
@@ -683,12 +706,58 @@ public class ExampleComponent : MonoBehaviour {
 - Add components at runtime  
 - Use reflection for components
 
+## 🔷 DOTS/ECS Development
+
+### 🚨 CRITICAL: Check DOTS Status BEFORE Writing Code
+
+**DOTS support is OPTIONAL and gated behind a compiler directive. You MUST verify it's enabled before writing ANY DOTS code!**
+
+### Check DOTS Status
+```bash
+# Check if DOTS is enabled (look for PERSPEC_DOTS_ENABLED in output)
+python PerSpec/Coordination/Scripts/quick_refresh.py full --wait
+# Then check Unity console or Control Center > Dashboard for "DOTS Support" status
+```
+
+### Enable DOTS Support
+1. Open Control Center: **Tools > PerSpec > Control Center**
+2. Go to **Debug Settings** tab
+3. Click **"Enable DOTS Support"** button
+4. Unity will recompile with `PERSPEC_DOTS_ENABLED` directive
+
+### ⚠️ What Happens If DOTS Is Disabled
+- All code in `PerSpec.Runtime.DOTS` and `PerSpec.Editor.DOTS` assemblies is **stripped**
+- `DOTSTestBase`, `DOTSTestFactory`, `DOTSTestConfiguration` are **not available**
+- Any test using `#if PERSPEC_DOTS_ENABLED` will be **excluded**
+- Compilation errors if you try to use DOTS types without enabling
+
+### ✅ Before Writing DOTS Code
+1. **Ask user**: "Is DOTS support enabled in PerSpec Control Center?"
+2. **Or check**: Look for `PERSPEC_DOTS_ENABLED` in Unity's Scripting Define Symbols
+3. **If disabled**: Guide user to enable it before proceeding
+
+### DOTS Code Requirements
+- All DOTS test files MUST be wrapped with `#if PERSPEC_DOTS_ENABLED`
+- Inherit from `DOTSTestBase` for ECS tests (auto-sets DefaultGameObjectInjectionWorld)
+- Ensure Unity.Entities package is installed when DOTS is enabled
+
+```csharp
+#if PERSPEC_DOTS_ENABLED
+using PerSpec.Editor.DOTS;
+
+public class MyDOTSTest : DOTSTestBase
+{
+    // Your DOTS test code here
+}
+#endif
+```
+
 ## 🧪 Test Requirements
 
 ### MANDATORY Base Classes
 ```csharp
 using PerSpec.Runtime.Unity;
-using PerSpec.Runtime.DOTS;  // For DOTS tests
+using PerSpec.Runtime.DOTS;  // For DOTS tests (requires PERSPEC_DOTS_ENABLED)
 
 [TestFixture]
 public class MyTest : UniTaskTestBase  // For Unity tests
@@ -746,17 +815,20 @@ public IEnumerator TestName() => UniTask.ToCoroutine(async () => {
 ✅ Use test facades for private access
 ✅ Follow 4-step TDD workflow
 ✅ Fix compilation errors properly with real solutions
+✅ Check if DOTS is enabled BEFORE writing any DOTS code
+✅ Wrap DOTS test files with #if PERSPEC_DOTS_ENABLED
 
 ### NEVER
 ❌ async void → Use UniTask/UniTaskVoid
 ❌ Singleton MonoBehaviours
 ❌ Runtime GetComponent
 ❌ Reflection for private access
-❌ Compiler directives in tests
+❌ Compiler directives in tests (except #if PERSPEC_DOTS_ENABLED for DOTS tests)
 ❌ Skip TDD steps
 ❌ Comment out code to "fix" compilation errors
 ❌ Remove functionality instead of fixing dependencies
-❌ Generate .meta files → Unity creates these automatically  
+❌ Generate .meta files → Unity creates these automatically
+❌ Write DOTS code without first verifying PERSPEC_DOTS_ENABLED is set  
 
 ## 🎮 Unity Menu Execution
 
@@ -824,8 +896,10 @@ python PerSpec/Coordination/Scripts/quick_menu.py cancel <request_id>
 | async void | UniTask/UniTaskVoid |
 | Thread error | SwitchToMainThread() |
 | Null components | FindVars pattern |
-| DefaultGameObjectInjectionWorld null | Inherit from DOTSTestBase |
+| DefaultGameObjectInjectionWorld null | Inherit from DOTSTestBase (and enable DOTS) |
 | NativeArray disposed | Use try-finally with Dispose() |
+| DOTSTestBase not found | Enable DOTS in Control Center > Debug Settings |
+| PerSpec.Editor.DOTS missing | Enable PERSPEC_DOTS_ENABLED compiler directive |
 
 ### Project Structure
 ```
@@ -869,6 +943,7 @@ TestFramework/
 
 > **🔴 AFTER WRITING CODE:** IMMEDIATELY refresh Unity AND check for errors!
 > **🔴 BEFORE RUNNING TESTS:** ALWAYS refresh Unity AND check for errors!
+> **🔷 BEFORE WRITING DOTS CODE:** ALWAYS verify PERSPEC_DOTS_ENABLED is set!
 > **Finished editing?** Run verification NOW (refresh + error check)
 > **Pivoting?** Ask user first
 > **New directory?** Needs asmdef
@@ -876,6 +951,7 @@ TestFramework/
 > **Test prefabs?** Use Editor scripts
 > **Tests failing?** Did you refresh Unity? Did you check for compilation errors?
 > **Code complete?** Did you verify it compiles? NO EXCEPTIONS!
+> **Writing DOTS?** Did you check if DOTS support is enabled? Wrap with #if PERSPEC_DOTS_ENABLED!
 <!-- PERSPEC_CONFIG_END -->
 <!-- PERSPEC_CONFIG_END -->
 <!-- PERSPEC_CONFIG_END -->
@@ -887,6 +963,16 @@ TestFramework/
 <!-- PERSPEC_CONFIG_END -->
 <!-- PERSPEC_CONFIG_END -->
 <!-- PERSPEC_CONFIG_END -->
+<!-- PERSPEC_CONFIG_END -->
+<!-- PERSPEC_CONFIG_END -->
+<!-- PERSPEC_CONFIG_END -->
+<!-- PERSPEC_CONFIG_END -->
+<!-- PERSPEC_CONFIG_END -->
+
+
+
+
+
 
 
 
