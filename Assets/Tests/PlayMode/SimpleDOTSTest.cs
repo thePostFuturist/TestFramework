@@ -1,3 +1,4 @@
+#if PERSPEC_DOTS_ENABLED
 using System;
 using System.Collections;
 using NUnit.Framework;
@@ -274,3 +275,4 @@ namespace Tests.PlayMode
         #endregion
     }
 }
+#endif

@@ -400,24 +400,6 @@ python PerSpec/Coordination/Scripts/monitor_editmode_logs.py --errors
 
 **Remember**: The user expects working code. It's YOUR responsibility as an LLM to ensure code compiles BEFORE considering any task complete.
 
-### 🎯 Natural Language Prompt Recognition
-
-**IMPORTANT**: As an LLM, you should recognize these natural language prompts from the user and automatically execute the corresponding commands:
-
-| User Says | Your Action | Execute |
-|-----------|-------------|---------|
-| "refresh Unity" | Immediately refresh Unity assets and compile | `python PerSpec/Coordination/Scripts/quick_refresh.py full --wait` |
-| "show errors" or "get errors" | Check for compilation errors | `python PerSpec/Coordination/Scripts/monitor_editmode_logs.py --errors` |
-| "run tests" | Execute test suite | `python PerSpec/Coordination/Scripts/quick_test.py all -p edit --wait` |
-
-**Automatic Triggering**: After writing or modifying ANY C# code:
-1. You MUST automatically execute "refresh Unity" (without waiting for user prompt)
-2. You MUST automatically execute "show errors" (without waiting for user prompt)
-3. Only proceed with other tasks if no compilation errors exist
-4. If errors exist, fix them immediately and repeat steps 1-2
-
-This is NOT optional - it is a MANDATORY part of your workflow as an LLM assistant working with Unity code.
-
 ## 🤖 Agent Usage
 
 ### Decision Matrix
@@ -968,6 +950,8 @@ TestFramework/
 <!-- PERSPEC_CONFIG_END -->
 <!-- PERSPEC_CONFIG_END -->
 <!-- PERSPEC_CONFIG_END -->
+<!-- PERSPEC_CONFIG_END -->
+
 
 
 
