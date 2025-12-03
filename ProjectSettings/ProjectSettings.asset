@@ -822,13 +822,13 @@ PlayerSettings:
   webGLCloseOnQuit: 0
   webWasm2023: 0
   scriptingDefineSymbols:
-    Android: PERSPEC_DOTS_ENABLED
+    Android: PERSPEC_DOTS_ENABLED;PERSPEC_DEBUG
     LinuxHeadlessSimulation: PERSPEC_DOTS_ENABLED
-    Server: PERSPEC_DOTS_ENABLED
-    Standalone: PERSPEC_DOTS_ENABLED
-    WebGL: PERSPEC_DOTS_ENABLED
+    Server: PERSPEC_DOTS_ENABLED;PERSPEC_DEBUG
+    Standalone: PERSPEC_DOTS_ENABLED;PERSPEC_DEBUG
+    WebGL: PERSPEC_DOTS_ENABLED;PERSPEC_DEBUG
     Windows Store Apps: PERSPEC_DOTS_ENABLED
-    iPhone: PERSPEC_DOTS_ENABLED
+    iPhone: PERSPEC_DOTS_ENABLED;PERSPEC_DEBUG
     tvOS: PERSPEC_DOTS_ENABLED
   additionalCompilerArguments: {}
   platformArchitecture: {}
